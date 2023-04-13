@@ -25,6 +25,7 @@ module PS2Controller(
     PS2_CLK,
     PS2_DAT,
     dataOUT,
+    asciiOUT,
     NEWDATA,
     KEYPRESS_S,
     KEYPRESS_P,
@@ -39,6 +40,7 @@ module PS2Controller(
     input PS2_CLK;
     input PS2_DAT;
     output[7:0] dataOUT;
+    output[7:0] asciiOUT;
     output NEWDATA;
     output      KEYPRESS_ESC,
                 KEYPRESS_UP,
@@ -50,6 +52,7 @@ module PS2Controller(
                 KEYPRESS_R;
     
     
+    reg asciiOUT;
     reg NEW_DATA_FLAG = 1'b0;
     
     reg[7:0] DAT_INT_CURRENT  = 8'd0; // internal data register, current data
@@ -57,12 +60,17 @@ module PS2Controller(
     reg[3:0] INDEX_IT         = 4'd1;
     
     reg CLK_INT               = 1'd0; // New data clock
-    reg STROBE_INT            = 1'd1;
+    //reg STROBE_INT            = 1'd1;
     
     assign NEWDATA = NEW_DATA_FLAG;
     
+    //always @ (negedge PS2_CLK)
+    //    if (NEWDATA==1'b1)
+    //        $display("pressed %d (%x) --> %d %x %c", dataOUT,dataOUT,asciiOUT,asciiOUT,asciiOUT);
+    
     always @ (negedge PS2_CLK)
     begin
+        //$display("data %d", PS2_DAT);
         //dataOUT[8] <= ~dataOUT[8];
         case (INDEX_IT)
             2: DAT_INT_CURRENT[0] <= PS2_DAT;
@@ -105,6 +113,7 @@ module PS2Controller(
     assign KEYPRESS_RIGHT   = (DAT_INT_PREVIOUS == 8'h74);
 
     
+
     always @ (posedge CLK_INT)
     begin
         if (DAT_INT_CURRENT == 8'd0)
@@ -115,9 +124,30 @@ module PS2Controller(
         else
         begin
             //STROBE = 1'b0;//(STROBE ^ (1'b1));
-            DAT_INT_PREVIOUS = DAT_INT_CURRENT;
+            DAT_INT_PREVIOUS <= DAT_INT_CURRENT;
             //dataOUT = 8'hFF;
         end
     end
+
+always @(*)
+    case (dataOUT)
+        8'h45: asciiOUT = "0";
+        8'h16: asciiOUT = "1";
+        8'h1E: asciiOUT = "2";
+        8'h26: asciiOUT = "3";
+        8'h25: asciiOUT = "4";
+        8'h2E: asciiOUT = "5";
+        8'h36: asciiOUT = "6";
+        8'h3D: asciiOUT = "7";
+        8'h3E: asciiOUT = "8";
+        8'h46: asciiOUT = "9";
+        8'h1C: asciiOUT = "A";
+        8'h32: asciiOUT = "B";
+        8'h21: asciiOUT = "C";
+        8'h23: asciiOUT = "D";
+        8'h24: asciiOUT = "E";
+        8'h2B: asciiOUT = "F";
+        default: asciiOUT = " ";
+    endcase
 endmodule
 

@@ -100,12 +100,11 @@ module pixel_gen(
     // Paddle Control
     always @* begin
         y_pad_next = y_pad_reg;     // no move
-        //if(refresh_tick)
+        if(refresh_tick)
             if(up & (y_pad_t > PAD_VELOCITY))
                 y_pad_next = y_pad_reg - PAD_VELOCITY;  // move up
-	else if(down & (y_pad_b < (Y_MAX - PAD_VELOCITY))) begin
+	        else if(down & (y_pad_b < (Y_MAX - PAD_VELOCITY)))
                 y_pad_next = y_pad_reg + PAD_VELOCITY;  // move down
-		end
     end
     
     // rom data square boundaries

@@ -31,8 +31,19 @@ const int BOTTOM_PORCH		= 	10;
 const int VERTICAL_SYNC		=	2;
 const int TOTAL_HEIGHT		=	525;
 
+const int SEVEN_SEGMET_HEIGHT = 30;
+
 // pixels are buffered here
 float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
+
+
+//coordinates of last mouse click
+int mouse_x=-10, mouse_y=-10; 
+int sw0=0, sw1=0, sw2=0, sw3=0;
+
+// seven segment inputs
+char ss[4] = {};
+int sub1,sub2;
 
 // calculating each pixel's size in accordance to OpenGL system
 // each axis in OpenGL is in the range [-1:1]
@@ -54,14 +65,101 @@ void render(void) {
     glFlush();
 }
 
+// gets called periodically to update screen
+void render2(void) {
+    int len, i;
+    char *message="Seven Segment: ";
+    glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    // Question: Why do we Push and Pop Matrix?
+    //glPushMatrix();
+    //int angle=0;
+    //glRotatef(angle, 0.0, 0.0, 1.0);
+    //glTranslatef(-750, 0, 0);
+    glColor3f(0.0f, 0.0f, 0.0f);
+    glRasterPos2f(300,-500);
+    //glScalef(2.0, 2.0, 2.0);
+
+    len = (int) strlen(message);
+    for (i = 0; i < len; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24 , message[i]);
+    }
+    for (i = 0; i < 4; i++) {
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24 , ss[i]);
+    }
+    //glPopMatrix();
+    
+    glColor3f(1.0f, 1.0f, 1.0f);
+    glRectf(-995,-1000, -905, 1000);
+    glRectf(-895,-1000, -805, 1000);
+    glRectf(-795,-1000, -705, 1000);
+    glRectf(-695,-1000, -605, 1000);
+
+    if (sw0) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
+    glRasterPos2f(-995,-500);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '0');
+    
+    if (sw1) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
+    glRasterPos2f(-895,-500);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '1');
+    
+    if (sw2) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
+    glRasterPos2f(-795,-500);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '2');
+    
+    if (sw3) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
+    glRasterPos2f(-695,-500);
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
+    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '3');
+
+    glutSwapBuffers();
+    
+    glFlush();
+}
+
 // timer to periodically update the screen
 void glutTimer(int t) {
+    glutSetWindow(sub2);
+    glutPostRedisplay();
+    glutSetWindow(sub1);
     glutPostRedisplay(); // re-renders the screen
     glutTimerFunc(t, glutTimer, t);
 }
 
+//mouse callback
+
+void mousepress(int button, int state, int x, int y) {
+
+
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+    mouse_x = x;
+    mouse_y = y;
+    //(x,y) are in window coordinates, where the origin is in the upper
+    //left corner; our reference system has the origin in lower left
+    //corner, this means we have to reflect y
+    //mouse_y = WINDOWSIZE - mouse_y; 
+    //printf("mouse pressed at (%d,%d)\n", mouse_x, mouse_y); 
+    if (mouse_x<30)       { printf("SW0\n"); sw0 = !sw0; display->sw0 = sw0; }
+    else if (mouse_x<60)  { printf("SW1\n"); sw1 = !sw1; display->sw1 = sw1; } 
+    else if (mouse_x<90)  { printf("SW2\n"); sw2 = !sw2; display->sw2 = sw2; }
+    else if (mouse_x<120) { printf("SW3\n"); sw3 = !sw3; display->sw3 = sw3; }
+  }
+  
+  glutPostRedisplay();
+}
+
+
+
+// PS2 keyboard input
 // handle up/down/left/right/space/enter arrow keys
-int keys[6] = {};
+//int keys[6] = {};
 int pressedkey = 0;
 int bit=0;
 
@@ -70,29 +168,93 @@ void Keyboard_input(unsigned char key, int x, int y) {
     switch(key) {
         case 13: //ENTER
             pressedkey=(0x5A <<1);
-            bit=9;
-            keys[5] = 1;
+            bit=11;
+            //keys[5] = 1;
             break;
         case 27: //ESC
             pressedkey=(0x76 <<1);
-            bit=9;
+            bit=11;
+            break;
+        case '0':
+            pressedkey=(0x45 <<1);
+            bit=11;
+            break;
+        case '1':
+            pressedkey=(0x16 <<1);
+            bit=11;
+            break;
+        case '2':
+            pressedkey=(0x1E <<1);
+            bit=11;
+            break;
+        case '3':
+            pressedkey=(0x26 <<1);
+            bit=11;
+            break;
+        case '4':
+            pressedkey=(0x25 <<1);
+            bit=11;
+            break;
+        case '5':
+            pressedkey=(0x2E <<1);
+            bit=11;
+            break;
+        case '6':
+            pressedkey=(0x36 <<1);
+            bit=11;
+            break;
+        case '7':
+            pressedkey=(0x3D <<1);
+            bit=11;
+            break;
+        case '8':
+            pressedkey=(0x3E <<1);
+            bit=11;
+            break;
+        case '9':
+            pressedkey=(0x46 <<1);
+            bit=11;
+            break;
+        case 'a': //'A'
+            pressedkey=(0x1C <<1);
+            bit=11;
+            break;
+        case 'b': //'B'
+            pressedkey=(0x32 <<1);
+            bit=11;
+            break;
+        case 'c': //'C'
+            pressedkey=(0x21 <<1);
+            bit=11;
+            break;
+        case 'd': //'D'
+            pressedkey=(0x23 <<1);
+            bit=11;
+            break;
+        case 'e': //'E'
+            pressedkey=(0x24 <<1);
+            bit=11;
+            break;
+        case 'f': //'F' 
+            pressedkey=(0x2B <<1);
+            bit=11;
             break;
         case 's': //'S'
             pressedkey=(0x1B <<1);
-            bit=9;
+            bit=11;
             break;
         case 'p':
             pressedkey=(0x4D <<1);
-            bit=9;
+            bit=11;
             break;
         case 'r':
             pressedkey=(0x2D <<1);
-            bit=9;
+            bit=11;
             break;
         case ' ':
             pressedkey=(0x29 <<1);
-            bit=9;
-            keys[4] = 1;
+            bit=11;
+            //keys[4] = 1;
             break;
 
     }
@@ -101,39 +263,87 @@ void Keyboard_input(unsigned char key, int x, int y) {
 void Special_input(int key, int x, int y) {
     switch(key) {
         case GLUT_KEY_UP:
-            keys[0] = 1;
             pressedkey=(0x75 <<1);
-            bit=9;
+            bit=11;
             break;
         case GLUT_KEY_DOWN:
-            keys[1] = 1;
             pressedkey=(0x72 <<1);
-            bit=9;
+            bit=11;
             break;
         case GLUT_KEY_LEFT:
-            keys[2] = 1;
             pressedkey=(0x6B <<1);
-            bit=9;
+            bit=11;
             break;
         case GLUT_KEY_RIGHT:
-            keys[3] = 1;
             pressedkey=(0x74 <<1);
-            bit=9;
+            bit=11;
             break;
     }
 }
 
+//callback for key release
+void Special_input_release(int key, int x, int y) {
+    switch(key) {
+        case GLUT_KEY_UP:
+            //keys[0] = 1;
+            pressedkey=(0x29 <<1);
+            bit=11;
+            break;
+        case GLUT_KEY_DOWN:
+            //keys[1] = 1;
+            pressedkey=(0x29 <<1);
+            bit=11;
+            break;
+        case GLUT_KEY_LEFT:
+            //keys[2] = 1;
+            pressedkey=(0x29 <<1);
+            bit=11;
+            break;
+        case GLUT_KEY_RIGHT:
+            //keys[3] = 1;
+            pressedkey=(0x29 <<1);
+            bit=11;
+            break;
+    }
+}
 // initiate and handle graphics
 void graphics_loop(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE);
-    glutInitWindowSize(ACTIVE_WIDTH, ACTIVE_HEIGHT);
+    glutInitWindowSize(ACTIVE_WIDTH, ACTIVE_HEIGHT+SEVEN_SEGMET_HEIGHT);
     glutInitWindowPosition(100, 100);
-    glutCreateWindow("VGA Simulator");
+    int window=glutCreateWindow("Basys 3 Simulator");
+    
+    //glutInitWindowSize(ACTIVE_WIDTH, 100);
+    //int window2=glutCreateWindow("Seven segment display");
+    //glutPositionWindow(100,580);
+    
+    //seven segmet subwindow
+    sub2=glutCreateSubWindow(window, 0,ACTIVE_HEIGHT,ACTIVE_WIDTH, SEVEN_SEGMET_HEIGHT);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluOrtho2D(0, 2000, 0, 2000);
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glLineWidth(3.0);
+    glTranslatef(1000, 1000, 0); 
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glColor3f(1.0, 1.0, 1.0);
+    glutMouseFunc(mousepress);
+    glutDisplayFunc(render2);
+    
+    sub1=glutCreateSubWindow(window, 0,0,ACTIVE_WIDTH, ACTIVE_HEIGHT);
     glutDisplayFunc(render);
+    
     glutKeyboardFunc(Keyboard_input);
     glutSpecialFunc(Special_input);
+    glutSpecialUpFunc(Special_input_release);
+    //glutIgnoreKeyRepeat(0); //report autorepeat keys    
     
+    glutSetWindow(window);
+
     gl_setup_complete = true;
     cout << "Graphics setup complete" << endl;
 
@@ -149,7 +359,7 @@ bool pre_h_sync = 0;
 bool pre_v_sync = 0;
 
 // set Verilog module inputs based on arrow key inputs
-void apply_input() {
+/*void apply_input() {
     display->up = keys[0];
     display->down = keys[1];
     display->left = keys[2];
@@ -159,21 +369,67 @@ void apply_input() {
     
     for(int i=0; i<6; i++)
         keys[i] = 0;
-}
+}*/
 
 // we only want the input to last for one or few clocks
-void discard_input() {
+/*void discard_input() {
     display->up = 0;
     display->down = 0;
     display->left = 0;
     display->right = 0;
     display->space = 0;
     display->enter = 0;
-}
+}*/
 
+void sample_7s() {
+    char key;
+    char code= display->ca+
+            2*display->cb+
+            4*display->cc+
+            8*display->cd+
+            16*display->ce+
+            32*display->cf+
+            64*display->cg;
+
+    switch (code) {
+        case 0x3F: key='0'; break;
+        case 0x06: key='1'; break;
+        case 0x5B: key='2'; break;
+        case 0x4F: key='3'; break;
+        case 0x66: key='4'; break;
+        case 0x6D: key='5'; break;
+        case 0x7D: key='6'; break;
+        case 0x07: key='7'; break;
+        case 0x7F: key='8'; break;
+        case 0x6F: key='9'; break;
+        case 0x77: key='A'; break;
+        case 0x7C: key='b'; break;
+        case 0x39: key='C'; break;
+        case 0x5E: key='d'; break;
+        case 0x79: key='E'; break;
+        case 0x71: key='F'; break;
+        case 0x00: key=' '; break;
+        case 0x40: key='-'; break;
+        case 0x63: key='r'; break;
+        case 0x76: key='U'; break;
+        case 0x38: key='L'; break;
+        case 0x54: key='D'; break;
+        case 0x73: key='o'; break;
+        case 0x5C: key='n'; break;
+        default: key=' ';
+    }
+
+    for(int i=0; i<4; i++)
+        ss[i] = '0';
+              
+    if(display->an==14) ss[0]=key;
+    if(display->an==13) ss[1]=key;
+    if(display->an==11) ss[2]=key;
+    if(display->an==7) ss[3]=key;
+}
 // read VGA outputs and update graphics buffer
 void sample_pixel() {
-    discard_input();
+    //discard_input();
     
     coord_x = (coord_x + 1) % TOTAL_WIDTH;
 
@@ -186,7 +442,7 @@ void sample_pixel() {
     if(!display->v_sync && pre_v_sync){ // on negative edge of v_sync
         // re-sync vertical counter
         coord_y = TOP_PORCH + ACTIVE_HEIGHT + VERTICAL_SYNC;
-        apply_input(); // inputs are pulsed once each new frame
+        //apply_input(); // inputs are pulsed once each new frame
     }
 
     if(coord_x < ACTIVE_WIDTH && coord_y < ACTIVE_HEIGHT){
@@ -214,7 +470,7 @@ void tick() {
     // falling edge
     display->clk = 0;
     
-
+    //apply PS2 inputs
     if ((main_time % 10000) == 0) { // every 10ms
         display->KEYSIG_CLK = 1;
     }
@@ -230,6 +486,9 @@ void tick() {
         }
     }
 
+    //if ((main_time % 10000) == 0) { // every 10ms
+    //        cout << "ss[0]: " << (int) ss[0] << endl;
+    //}
     display->eval();
 }
 
@@ -279,13 +538,15 @@ int main(int argc, char** argv) {
     while (!Verilated::gotFinish()) {
         // main clock is 100 MHz
         tick();
-	discard_input();
+	    //discard_input();
         tick();
         tick();
         tick();
         // the clock frequency of VGA is 25 MHz of that of the whole model
         // so we sample from VGA every other clock
         sample_pixel();
+        // sample seven segment display
+        sample_7s(); 
         if (vcd) tfp->dump(main_time);
     }
     if (vcd) tfp->close();
