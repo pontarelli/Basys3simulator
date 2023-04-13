@@ -1,12 +1,15 @@
 #include <verilated.h>          // defines common routines
 #include "verilated_vcd_c.h"
 #include <GL/glut.h>
+#include <FTGL/ftgl.h>
 #include <thread>
 #include <iostream>
 
 #include "Vdisplay.h"           // from Verilating "display.v"
 
 using namespace std;
+
+FTGL::FTGLfont *font;
 
 Vdisplay* display;              // instantiation of the model
 
@@ -42,7 +45,7 @@ int mouse_x=-10, mouse_y=-10;
 int sw0=0, sw1=0, sw2=0, sw3=0;
 
 // seven segment inputs
-char ss[4] = {};
+char ss[5] = "0000";
 int sub1,sub2;
 
 // calculating each pixel's size in accordance to OpenGL system
@@ -77,18 +80,26 @@ void render2(void) {
     //glRotatef(angle, 0.0, 0.0, 1.0);
     //glTranslatef(-750, 0, 0);
     glColor3f(0.0f, 0.0f, 0.0f);
-    glRasterPos2f(300,-500);
+    glRasterPos2f(800,-500);
     //glScalef(2.0, 2.0, 2.0);
 
-    len = (int) strlen(message);
+    /*len = (int) strlen(message);
     for (i = 0; i < len; i++) {
         glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24 , message[i]);
-    }
-    for (i = 0; i < 4; i++) {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24 , ss[i]);
-    }
-    //glPopMatrix();
+    }*/
     
+    /* Set the font size and render the SS display*/
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glPushAttrib(GL_ALL_ATTRIB_BITS);
+
+    glPixelTransferf(GL_RED_BIAS, 0);
+    glPixelTransferf(GL_GREEN_BIAS, 2);
+    glPixelTransferf(GL_BLUE_BIAS, 0);
+
+    FTGL::ftglSetFontFaceSize(font, 28, 28);
+    //seven segment print
+    FTGL::ftglRenderFont(font, ss, FTGL::RENDER_ALL);
+
     glColor3f(1.0f, 1.0f, 1.0f);
     glRectf(-995,-1000, -905, 1000);
     glRectf(-895,-1000, -805, 1000);
@@ -123,6 +134,8 @@ void render2(void) {
     
     glFlush();
 }
+
+
 
 // timer to periodically update the screen
 void glutTimer(int t) {
@@ -306,6 +319,7 @@ void Special_input_release(int key, int x, int y) {
             break;
     }
 }
+
 // initiate and handle graphics
 void graphics_loop(int argc, char** argv) {
     glutInit(&argc, argv);
@@ -318,7 +332,7 @@ void graphics_loop(int argc, char** argv) {
     //int window2=glutCreateWindow("Seven segment display");
     //glutPositionWindow(100,580);
     
-    //seven segmet subwindow
+    //seven segment subwindow
     sub2=glutCreateSubWindow(window, 0,ACTIVE_HEIGHT,ACTIVE_WIDTH, SEVEN_SEGMET_HEIGHT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -332,6 +346,13 @@ void graphics_loop(int argc, char** argv) {
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glColor3f(1.0, 1.0, 1.0);
     glutMouseFunc(mousepress);
+
+    /* Create a pixmap font from a TrueType file. */
+    font = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
+
+    /* Destroy the font object. */
+    //ftglDestroyFont(font);
+
     glutDisplayFunc(render2);
     
     sub1=glutCreateSubWindow(window, 0,0,ACTIVE_WIDTH, ACTIVE_HEIGHT);
