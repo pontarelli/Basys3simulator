@@ -185,144 +185,115 @@ int bit=0;
 
 void Keyboard_input(unsigned char key, int x, int y) {
     //cout << "key: " << key << endl;
+    bit=11;
     switch(key) {
         case 13: //ENTER
             pressedkey=(0x5A <<1);
-            bit=11;
             //keys[5] = 1;
             break;
         case 27: //ESC
             pressedkey=(0x76 <<1);
-            bit=11;
             break;
         case '0':
             pressedkey=(0x45 <<1);
-            bit=11;
             break;
         case '1':
             pressedkey=(0x16 <<1);
-            bit=11;
             break;
         case '2':
             pressedkey=(0x1E <<1);
-            bit=11;
             break;
         case '3':
             pressedkey=(0x26 <<1);
-            bit=11;
             break;
         case '4':
             pressedkey=(0x25 <<1);
-            bit=11;
             break;
         case '5':
             pressedkey=(0x2E <<1);
-            bit=11;
             break;
         case '6':
             pressedkey=(0x36 <<1);
-            bit=11;
             break;
         case '7':
             pressedkey=(0x3D <<1);
-            bit=11;
             break;
         case '8':
             pressedkey=(0x3E <<1);
-            bit=11;
             break;
         case '9':
             pressedkey=(0x46 <<1);
-            bit=11;
             break;
         case 'a': //'A'
             pressedkey=(0x1C <<1);
-            bit=11;
             break;
         case 'b': //'B'
             pressedkey=(0x32 <<1);
-            bit=11;
             break;
         case 'c': //'C'
             pressedkey=(0x21 <<1);
-            bit=11;
             break;
         case 'd': //'D'
             pressedkey=(0x23 <<1);
-            bit=11;
             break;
         case 'e': //'E'
             pressedkey=(0x24 <<1);
-            bit=11;
             break;
         case 'f': //'F' 
             pressedkey=(0x2B <<1);
-            bit=11;
             break;
         case 's': //'S'
             pressedkey=(0x1B <<1);
-            bit=11;
             break;
         case 'p':
             pressedkey=(0x4D <<1);
-            bit=11;
             break;
         case 'r':
             pressedkey=(0x2D <<1);
-            bit=11;
             break;
         case ' ':
             pressedkey=(0x29 <<1);
-            bit=11;
-            //keys[4] = 1;
             break;
-
     }
 }
 
 void Special_input(int key, int x, int y) {
+    bit=11;
     switch(key) {
         case GLUT_KEY_UP:
             pressedkey=(0x75 <<1);
-            bit=11;
             break;
         case GLUT_KEY_DOWN:
             pressedkey=(0x72 <<1);
-            bit=11;
             break;
         case GLUT_KEY_LEFT:
             pressedkey=(0x6B <<1);
-            bit=11;
             break;
         case GLUT_KEY_RIGHT:
             pressedkey=(0x74 <<1);
-            bit=11;
             break;
     }
 }
 
 //callback for key release
 void Special_input_release(int key, int x, int y) {
+    bit=11;
     switch(key) {
         case GLUT_KEY_UP:
             //keys[0] = 1;
             pressedkey=(0x29 <<1);
-            bit=11;
             break;
         case GLUT_KEY_DOWN:
             //keys[1] = 1;
             pressedkey=(0x29 <<1);
-            bit=11;
             break;
         case GLUT_KEY_LEFT:
             //keys[2] = 1;
             pressedkey=(0x29 <<1);
-            bit=11;
             break;
         case GLUT_KEY_RIGHT:
             //keys[3] = 1;
             pressedkey=(0x29 <<1);
-            bit=11;
             break;
     }
 }
