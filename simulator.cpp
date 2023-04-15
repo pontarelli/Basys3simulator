@@ -10,7 +10,7 @@
 
 using namespace std;
 
-FTGL::FTGLfont *font;
+FTGL::FTGLfont *font,*font7s;
 
 Vdisplay* display;              // instantiation of the model
 
@@ -35,7 +35,7 @@ const int BOTTOM_PORCH		= 	10;
 const int VERTICAL_SYNC		=	2;
 const int TOTAL_HEIGHT		=	525;
 
-const int SEVEN_SEGMET_HEIGHT = 50;
+const int SEVEN_SEGMENT_HEIGHT = 60;
 
 // pixels are buffered here
 float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
@@ -44,7 +44,7 @@ float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
 //coordinates of last mouse click
 int mouse_x=-10, mouse_y=-10; 
 int VGAsw=0;
-int sw0=0, sw1=0, sw2=0, sw3=0;
+int sw[16]={0};
 
 //images
 RGBpixmap  img_switch_on;
@@ -86,30 +86,28 @@ void render2(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     
     glColor3f(0.0f, 0.0f, 0.0f);
-    glRasterPos2f(700,-500);
     
     /* Set the font size and render the SS display*/
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
-    //glPixelTransferf(GL_RED_BIAS, 0);
-    //glPixelTransferf(GL_GREEN_BIAS, 2);
-    //glPixelTransferf(GL_BLUE_BIAS, 0);
-    //FTGL::ftglRenderFont(font, ss, FTGL::RENDER_ALL);
-
-    FTGL::ftglSetFontFaceSize(font, 48, 48);
+    FTGL::ftglSetFontFaceSize(font7s, 48, 48);
     //seven segment print
     for (i=0; i<4; i++) {
         char str[2] = "\0"; /* 1 character + null terminator */
         if (ss[i] ==0x20) {
-            glPixelTransferf(GL_GREEN_BIAS, 0); 
+            glPixelTransferf(GL_RED_BIAS, 0.86);
+            glPixelTransferf(GL_GREEN_BIAS, 0.86); 
+            glPixelTransferf(GL_BLUE_BIAS, 0.86);
             str[0] = '0';
         }
         else {
-            glPixelTransferf(GL_GREEN_BIAS, 2); 
+            glPixelTransferf(GL_RED_BIAS, 0);
+            glPixelTransferf(GL_GREEN_BIAS, 1); 
+            glPixelTransferf(GL_BLUE_BIAS, 0);
             str[0] = ss[i];
         }
-        glRasterPos2f(700+64*i,-500);
-        FTGL::ftglRenderFont(font, str, FTGL::RENDER_ALL);
+        glRasterPos2f(620+64*i,-500);
+        FTGL::ftglRenderFont(font7s, str, FTGL::RENDER_ALL);
     }
     
     //SWITCH buttons
@@ -125,17 +123,19 @@ void render2(void) {
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '0');
     */
     
-    glRasterPos2f(-995,-1000);
-    if (sw0) img_switch_on.draw(); else img_switch_off.draw();
-    glRasterPos2f(-895,-1000);
-    if (sw1) img_switch_on.draw(); else img_switch_off.draw();
-    glRasterPos2f(-795,-1000);
-    if (sw2) img_switch_on.draw(); else img_switch_off.draw();
-    glRasterPos2f(-695,-1000);
-    if (sw3) img_switch_on.draw(); else img_switch_off.draw();
-    glRasterPos2f(-595,-1000);
+    FTGL::ftglSetFontFaceSize(font, 13, 13);
+    for (int i=0; i<16; i++) {
+        glRasterPos2f(-995+100*i,-750);
+        if (sw[i]) img_switch_on.draw(); else img_switch_off.draw();
+        glRasterPos2f(-1000+100*i,-950);
+        char str[8];
+        sprintf(str, "SW%d", i);
+        FTGL::ftglRenderFont(font, str, FTGL::RENDER_ALL);
+    }
+    glRasterPos2f(900,-750);
     if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
-
+    glRasterPos2f(910,-920);
+    FTGL::ftglRenderFont(font, "VGA", FTGL::RENDER_ALL);
     glutSwapBuffers();
     
     glFlush();
@@ -165,11 +165,16 @@ void mousepress(int button, int state, int x, int y) {
     //corner, this means we have to reflect y
     //mouse_y = WINDOWSIZE - mouse_y; 
     //printf("mouse pressed at (%d,%d)\n", mouse_x, mouse_y); 
-    if (mouse_x<30)       { printf("SW0\n"); sw0 = !sw0; display->sw0 = sw0; }
-    else if (mouse_x<60)  { printf("SW1\n"); sw1 = !sw1; display->sw1 = sw1; } 
-    else if (mouse_x<90)  { printf("SW2\n"); sw2 = !sw2; display->sw2 = sw2; }
-    else if (mouse_x<120) { printf("SW3\n"); sw3 = !sw3; display->sw3 = sw3; }
-    else if (mouse_x<150) { printf("SW_VGA\n"); VGAsw = !VGAsw;}
+    int index= mouse_x/32;
+    if (index<16) {
+        printf("SW%d\n", index);
+        sw[index] = !sw[index];
+        if (index==0) display->sw0 = sw[0];
+        if (index==1) display->sw1 = sw[1];
+        if (index==2) display->sw2 = sw[2];
+        if (index==3) display->sw3 = sw[3];
+    }
+    if (index==19) { printf("SW_VGA\n"); VGAsw = !VGAsw;}
   }
   
   glutPostRedisplay();
@@ -302,12 +307,12 @@ void Special_input_release(int key, int x, int y) {
 void graphics_loop(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE);
-    glutInitWindowSize(ACTIVE_WIDTH, ACTIVE_HEIGHT+SEVEN_SEGMET_HEIGHT);
+    glutInitWindowSize(ACTIVE_WIDTH, ACTIVE_HEIGHT+SEVEN_SEGMENT_HEIGHT);
     glutInitWindowPosition(100, 100);
     int window=glutCreateWindow("Basys 3 Simulator");
     
     //seven segment subwindow
-    sub2=glutCreateSubWindow(window, 0,ACTIVE_HEIGHT,ACTIVE_WIDTH, SEVEN_SEGMET_HEIGHT);
+    sub2=glutCreateSubWindow(window, 0,ACTIVE_HEIGHT,ACTIVE_WIDTH, SEVEN_SEGMENT_HEIGHT);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluOrtho2D(0, 2000, 0, 2000);
@@ -321,7 +326,8 @@ void graphics_loop(int argc, char** argv) {
     glutMouseFunc(mousepress);
 
     /* Create a pixmap font from a TrueType file. */
-    font = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
+    font = FTGL::ftglCreatePixmapFont("./CalibriRegular.ttf");
+    font7s = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
 
     //load bitmaps
     img_switch_on.readBMPFile("./SWon.bmp",false);
