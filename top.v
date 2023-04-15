@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module display(
+module top(
     input clk,              // from Basys 3
     input reset,            // btnR
     input KEYSIG_DATA,      // PS2

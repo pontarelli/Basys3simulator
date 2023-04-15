@@ -6,13 +6,13 @@
 #include <thread>
 #include <iostream>
 
-#include "Vdisplay.h"           // from Verilating "display.v"
+#include "Vtop.h"           // from Verilating "top.v"
 
 using namespace std;
 
 FTGL::FTGLfont *font,*font7s;
 
-Vdisplay* display;              // instantiation of the model
+Vtop* top;              // instantiation of the model
 
 uint64_t main_time = 0;         // current simulation time
 double sc_time_stamp() {        // called by $time in Verilog
@@ -144,7 +144,7 @@ void render2(void) {
     //draw LEDs
     for (int i=0; i<16; i++) {
         glRasterPos2f(-990+100*i,470);
-        if (display->LED & (1<<i)) img_led_on.draw(); else img_led_off.draw();
+        if (top->LED & (1<<i)) img_led_on.draw(); else img_led_off.draw();
     }
     
 
@@ -179,11 +179,14 @@ void mousepress(int button, int state, int x, int y) {
     //printf("mouse pressed at (%d,%d)\n", mouse_x, mouse_y); 
     int index= mouse_x/32;
     if (index<16) {
-        printf("SW%d\n", index);
+        //printf("SW%d\n", index);
         sw[index] = !sw[index];
-        display->sw = display->sw ^ (1 << index);
+        top->sw = top->sw ^ (1 << index);
     }
-    if (index==19) { printf("SW_VGA\n"); VGAsw = !VGAsw;}
+    if (index==19) { 
+	    //printf("SW_VGA\n"); 
+	    VGAsw = !VGAsw;
+    }
   }
   
   glutPostRedisplay();
@@ -375,12 +378,12 @@ bool pre_v_sync = 0;
 
 // set Verilog module inputs based on arrow key inputs
 /*void apply_input() {
-    display->up = keys[0];
-    display->down = keys[1];
-    display->left = keys[2];
-    display->right = keys[3];
-    display->space = keys[4];
-    display->enter = keys[5];
+    top->up = keys[0];
+    top->down = keys[1];
+    top->left = keys[2];
+    top->right = keys[3];
+    top->space = keys[4];
+    top->enter = keys[5];
     
     for(int i=0; i<6; i++)
         keys[i] = 0;
@@ -388,26 +391,26 @@ bool pre_v_sync = 0;
 
 // we only want the input to last for one or few clocks
 /*void discard_input() {
-    display->up = 0;
-    display->down = 0;
-    display->left = 0;
-    display->right = 0;
-    display->space = 0;
-    display->enter = 0;
+    top->up = 0;
+    top->down = 0;
+    top->left = 0;
+    top->right = 0;
+    top->space = 0;
+    top->enter = 0;
 }*/
 
 void sample_7s() {
     char key;
-    /*char code= display->ca+
-            2*display->cb+
-            4*display->cc+
-            8*display->cd+
-            16*display->ce+
-            32*display->cf+
-            64*display->cg;
+    /*char code= top->ca+
+            2*top->cb+
+            4*top->cc+
+            8*top->cd+
+            16*top->ce+
+            32*top->cf+
+            64*top->cg;
             */
 
-    switch (display->seg) {
+    switch (top->seg) {
         case 0x3F: key='0'; break;
         case 0x06: key='1'; break;
         case 0x5B: key='2'; break;
@@ -438,10 +441,10 @@ void sample_7s() {
     for(int i=0; i<4; i++)
         ss[i] = ' ';
               
-    if(display->an==14) ss[0]=key;
-    if(display->an==13) ss[1]=key;
-    if(display->an==11) ss[2]=key;
-    if(display->an==7) ss[3]=key;
+    if(top->an==14) ss[0]=key;
+    if(top->an==13) ss[1]=key;
+    if(top->an==11) ss[2]=key;
+    if(top->an==7) ss[3]=key;
 }
 // read VGA outputs and update graphics buffer
 void sample_pixel() {
@@ -449,29 +452,29 @@ void sample_pixel() {
     
     coord_x = (coord_x + 1) % TOTAL_WIDTH;
 
-    if(!display->h_sync && pre_h_sync){ // on negative edge of h_sync
+    if(!top->h_sync && pre_h_sync){ // on negative edge of h_sync
         // re-sync horizontal counter
         coord_x = RIGHT_PORCH + ACTIVE_WIDTH + HORIZONTAL_SYNC;
         coord_y = (coord_y + 1) % TOTAL_HEIGHT;
     }
 
-    if(!display->v_sync && pre_v_sync){ // on negative edge of v_sync
+    if(!top->v_sync && pre_v_sync){ // on negative edge of v_sync
         // re-sync vertical counter
         coord_y = TOP_PORCH + ACTIVE_HEIGHT + VERTICAL_SYNC;
         //apply_input(); // inputs are pulsed once each new frame
     }
 
     if(coord_x < ACTIVE_WIDTH && coord_y < ACTIVE_HEIGHT){
-        int r = display->R_VAL;
-        int g = display->G_VAL;
-        int b = display->B_VAL;
+        int r = top->R_VAL;
+        int g = top->G_VAL;
+        int b = top->B_VAL;
         graphics_buffer[coord_x][coord_y][0] = float(r)/16.0;
         graphics_buffer[coord_x][coord_y][1] = float(g)/16.0;
         graphics_buffer[coord_x][coord_y][2] = float(b)/16.0;
     }
 
-    pre_h_sync = display->h_sync;
-    pre_v_sync = display->v_sync;
+    pre_h_sync = top->h_sync;
+    pre_v_sync = top->v_sync;
 }
 
 // simulate for a single clock
@@ -480,23 +483,23 @@ void tick() {
     main_time++;
 
     // rising edge
-    display->clk = 1;
-    display->eval();
+    top->clk = 1;
+    top->eval();
 
     // falling edge
-    display->clk = 0;
+    top->clk = 0;
     
     //apply PS2 inputs
     if ((main_time % 10000) == 0) { // every 10ms
-        display->KEYSIG_CLK = 1;
+        top->KEYSIG_CLK = 1;
     }
     if ((main_time % 10000) == 5000) {
         if (bit==0) {
-            display->KEYSIG_DATA = 1;
+            top->KEYSIG_DATA = 1;
         }
         else {
-            display->KEYSIG_CLK = 0; 
-            display->KEYSIG_DATA = pressedkey & 0x1;
+            top->KEYSIG_CLK = 0; 
+            top->KEYSIG_DATA = pressedkey & 0x1;
             pressedkey = pressedkey >>1; 
             bit--;
         }
@@ -505,26 +508,29 @@ void tick() {
     //if ((main_time % 10000) == 0) { // every 10ms
     //        cout << "ss[0]: " << (int) ss[0] << endl;
     //}
-    display->eval();
+    top->eval();
 }
 
 // globally reset the model
 void reset() {
-    display->reset = 1;
-    display->clk = 0;
-    display->eval();
+    top->reset = 1;
+    top->clk = 0;
+    top->eval();
     tick();
-    display->reset = 0;
+    top->reset = 0;
 }
 
 int main(int argc, char** argv) {
     
     bool vcd=false;
 
-    if (argc==2)
+    int dump_level=1;    
+    if (argc>1)
         if (strcmp(argv[1],"-vcd")==0)
             vcd=true;
-        
+    if (argc>2)
+        if (atoi(argv[2])>0)
+            dump_level=atoi(argv[2]);
     
     // create a new thread for graphics handling
     thread thread(graphics_loop, argc, argv);
@@ -536,20 +542,18 @@ int main(int argc, char** argv) {
 
 
     // create the model
-    display = new Vdisplay;
+    top = new Vtop;
 
     VerilatedVcdC* tfp = new VerilatedVcdC;
     if (vcd) {
         Verilated::traceEverOn(true);
-        display->trace(tfp, 99);
-        tfp->dumpvars(1, "TOP.display");
-        tfp->dumpvars(1, "TOP.display.Snake");
-        tfp->dumpvars(1, "TOP.display.CLKController");
+        top->trace(tfp, 99);
+        tfp->dumpvars(dump_level, "TOP.top");
         tfp->open("wave.vcd");
     }
     // reset the model
     reset();
-    //display->s1 = 1;
+    //top->s1 = 1;
     // cycle accurate simulation loop
     while (!Verilated::gotFinish()) {
         // main clock is 100 MHz
@@ -566,8 +570,8 @@ int main(int argc, char** argv) {
         if (vcd) tfp->dump(main_time);
     }
     if (vcd) tfp->close();
-    display->final();
+    top->final();
 
-    delete display;
+    delete top;
 }
 
