@@ -8,12 +8,20 @@ OK_STRING=$(OK_COLOR)[OK]$(NO_COLOR)
 LEVEL=1
 
 
+help:
+	@echo -e '$(OK_COLOR)'
+	@echo -e 'Usage: $(NO_COLOR)'
+	@echo -e 'make help: display this message'
+	@echo -e 'make all: build the simulator with the specified verilog module'
+	@echo -e 'make run: simulate the verilog module on the BASYS3 simulator'
+	@echo -e 'make sim [LEVEL=n]: simulate the verilog module on the BASYS3 simulator dump the waveform down to ithe n-th level '
+
 all:
-	 @verilator -Wno-WIDTH -Wno-PINMISSING --trace --top-module top --cc --exe simulator.cpp RGBpixmap.cpp *.v -CFLAGS -I/usr/include/freetype2 \
-	 -LDFLAGS -lglut -LDFLAGS -lGLU -LDFLAGS -lpthread -LDFLAGS -lGL -LDFLAGS -lfreetype -LDFLAGS -lftgl
-	 @echo -e '$(OK_COLOR)[*] Compiled Verilog modules $(NO_COLOR)'
-	 @make  --silent -j -C obj_dir -f Vtop.mk Vtop
-	 @echo -e '$(OK_COLOR)[*] Created executable$(NO_COLOR)'
+	@verilator -Wno-WIDTH -Wno-PINMISSING --trace --top-module top --cc --exe simulator.cpp RGBpixmap.cpp *.v -CFLAGS -I/usr/include/freetype2 \
+	-LDFLAGS -lglut -LDFLAGS -lGLU -LDFLAGS -lpthread -LDFLAGS -lGL -LDFLAGS -lfreetype -LDFLAGS -lftgl
+	@echo -e '$(OK_COLOR)[*] Compiled Verilog modules $(NO_COLOR)'
+	@make  --silent -j -C obj_dir -f Vtop.mk Vtop
+	@echo -e '$(OK_COLOR)[*] Created executable$(NO_COLOR)'
 
 run: all
 	@echo -e '$(OK_COLOR)[*] Run Simulator $(NO_COLOR)'
