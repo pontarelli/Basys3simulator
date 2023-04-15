@@ -6,16 +6,11 @@ module display(
     input KEYSIG_DATA,      // PS2
     input KEYSIG_CLK,       // PS2
     input [15:0] sw,              // SWITCH
-    /*input up,               
-    input down,             
-    input left,             
-    input right,             
-    input space,            
-    input enter,            
-    */
+    
+    input up,reset,down,       // push buttons
     //seven segment display
     output [3:0] an,           //select digit 
-    output ca,cb,cc,cd,ce,cf,cg,  // select segment    
+    output [7:0] seg,  // select segment    
     
     output h_sync,           // to VGA port
     output v_sync,           // to VGA port
@@ -41,6 +36,7 @@ module display(
     
 
     seven_segment ss(.clk(clk), .reset(w_reset), .key(asciiOUT), .an(an), .ca(ca), .cb(cb), .cc(cc), .cd(cd), .ce(ce), .cf(cf), .cg(cg));
+    assign seg = {ca,cb,cc,cd,ce,cf,cg};
     // rgb buffer
     always @(posedge clk)
         if(w_p_tick)
