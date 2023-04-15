@@ -43,11 +43,13 @@ float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
 
 //coordinates of last mouse click
 int mouse_x=-10, mouse_y=-10; 
+int VGAsw=0;
 int sw0=0, sw1=0, sw2=0, sw3=0;
 
-//switch images
-RGBpixmap  swbmp_on;
-RGBpixmap  swbmp_off;
+//images
+RGBpixmap  img_switch_on;
+RGBpixmap  img_switch_off;
+RGBpixmap  img_board;
 
 
 // seven segment inputs
@@ -64,13 +66,15 @@ void render(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     
     // convert pixels into OpenGL rectangles
-    for(int i = 0; i < ACTIVE_WIDTH; i++){
-        for(int j = 0; j < ACTIVE_HEIGHT; j++){
-            glColor3f(graphics_buffer[i][j][0], graphics_buffer[i][j][1], graphics_buffer[i][j][2]);
-            glRectf(i*pixel_w-1, -j*pixel_h+1, (i+1)*pixel_w-1, -(j+1)*pixel_h+1);
+    if (VGAsw)
+        for(int i = 0; i < ACTIVE_WIDTH; i++){
+            for(int j = 0; j < ACTIVE_HEIGHT; j++){
+                glColor3f(graphics_buffer[i][j][0], graphics_buffer[i][j][1], graphics_buffer[i][j][2]);
+                glRectf(i*pixel_w-1, -j*pixel_h+1, (i+1)*pixel_w-1, -(j+1)*pixel_h+1);
+            }
         }
-    }
-    
+    else
+        img_board.draw();
     glFlush();
 }
 
@@ -122,13 +126,15 @@ void render2(void) {
     */
     
     glRasterPos2f(-995,-1000);
-    if (sw0) swbmp_on.draw(); else swbmp_off.draw();
+    if (sw0) img_switch_on.draw(); else img_switch_off.draw();
     glRasterPos2f(-895,-1000);
-    if (sw1) swbmp_on.draw(); else swbmp_off.draw();
+    if (sw1) img_switch_on.draw(); else img_switch_off.draw();
     glRasterPos2f(-795,-1000);
-    if (sw2) swbmp_on.draw(); else swbmp_off.draw();
+    if (sw2) img_switch_on.draw(); else img_switch_off.draw();
     glRasterPos2f(-695,-1000);
-    if (sw3) swbmp_on.draw(); else swbmp_off.draw();
+    if (sw3) img_switch_on.draw(); else img_switch_off.draw();
+    glRasterPos2f(-595,-1000);
+    if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
 
     glutSwapBuffers();
     
@@ -163,6 +169,7 @@ void mousepress(int button, int state, int x, int y) {
     else if (mouse_x<60)  { printf("SW1\n"); sw1 = !sw1; display->sw1 = sw1; } 
     else if (mouse_x<90)  { printf("SW2\n"); sw2 = !sw2; display->sw2 = sw2; }
     else if (mouse_x<120) { printf("SW3\n"); sw3 = !sw3; display->sw3 = sw3; }
+    else if (mouse_x<150) { printf("SW_VGA\n"); VGAsw = !VGAsw;}
   }
   
   glutPostRedisplay();
@@ -345,10 +352,10 @@ void graphics_loop(int argc, char** argv) {
     /* Create a pixmap font from a TrueType file. */
     font = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
 
-    //init SW bitmap
-    //MakeImage("./sw.bmp", SWTextureName, false);
-    swbmp_on.readBMPFile("./SWon.bmp",false);
-    swbmp_off.readBMPFile("./SWoff.bmp",false);
+    //load bitmaps
+    img_switch_on.readBMPFile("./SWon.bmp",false);
+    img_switch_off.readBMPFile("./SWoff.bmp",false);
+    img_board.readBMPFile("./board.bmp",false);
 
     glutDisplayFunc(render2);
     
