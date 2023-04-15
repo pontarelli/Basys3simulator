@@ -35,7 +35,7 @@ const int BOTTOM_PORCH		= 	10;
 const int VERTICAL_SYNC		=	2;
 const int TOTAL_HEIGHT		=	525;
 
-const int SEVEN_SEGMENT_HEIGHT = 60;
+const int SEVEN_SEGMENT_HEIGHT = 90;
 
 // pixels are buffered here
 float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
@@ -47,6 +47,8 @@ int VGAsw=0;
 int sw[16]={0};
 
 //images
+RGBpixmap  img_led_on;
+RGBpixmap  img_led_off;
 RGBpixmap  img_switch_on;
 RGBpixmap  img_switch_off;
 RGBpixmap  img_board;
@@ -81,7 +83,6 @@ void render(void) {
 // gets called periodically to update screen
 void render2(void) {
     int len, i;
-    char *message="Seven Segment: ";
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     
@@ -123,6 +124,8 @@ void render2(void) {
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '0');
     */
     
+    //draw SWITCH buttons
+    
     FTGL::ftglSetFontFaceSize(font, 13, 13);
     for (int i=0; i<16; i++) {
         glRasterPos2f(-995+100*i,-750);
@@ -132,10 +135,19 @@ void render2(void) {
         sprintf(str, "SW%d", i);
         FTGL::ftglRenderFont(font, str, FTGL::RENDER_ALL);
     }
+    
     glRasterPos2f(900,-750);
     if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
     glRasterPos2f(910,-920);
     FTGL::ftglRenderFont(font, "VGA", FTGL::RENDER_ALL);
+
+    //draw LEDs
+    for (int i=0; i<16; i++) {
+        glRasterPos2f(-990+100*i,470);
+        if (display->LED & (1<<i)) img_led_on.draw(); else img_led_off.draw();
+    }
+    
+
     glutSwapBuffers();
     
     glFlush();
@@ -329,7 +341,10 @@ void graphics_loop(int argc, char** argv) {
     //load bitmaps
     img_switch_on.readBMPFile("./SWon.bmp",false);
     img_switch_off.readBMPFile("./SWoff.bmp",false);
+    img_led_on.readBMPFile("./LEDon.bmp",false);
+    img_led_off.readBMPFile("./LEDoff.bmp",false);
     img_board.readBMPFile("./board.bmp",false);
+    
 
     glutDisplayFunc(render2);
     
@@ -383,15 +398,16 @@ bool pre_v_sync = 0;
 
 void sample_7s() {
     char key;
-    char code= display->ca+
+    /*char code= display->ca+
             2*display->cb+
             4*display->cc+
             8*display->cd+
             16*display->ce+
             32*display->cf+
             64*display->cg;
+            */
 
-    switch (code) {
+    switch (display->seg) {
         case 0x3F: key='0'; break;
         case 0x06: key='1'; break;
         case 0x5B: key='2'; break;
