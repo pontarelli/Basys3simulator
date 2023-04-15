@@ -5,10 +5,7 @@ module display(
     input reset,            // btnR
     input KEYSIG_DATA,      // PS2
     input KEYSIG_CLK,       // PS2
-    input sw0,              // SWITCH
-    input sw1,              // SWITCH
-    input sw2,              // SWITCH
-    input sw3,              // SWITCH
+    input [15:0] sw,              // SWITCH
     /*input up,               
     input down,             
     input left,             

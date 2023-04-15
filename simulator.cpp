@@ -169,10 +169,7 @@ void mousepress(int button, int state, int x, int y) {
     if (index<16) {
         printf("SW%d\n", index);
         sw[index] = !sw[index];
-        if (index==0) display->sw0 = sw[0];
-        if (index==1) display->sw1 = sw[1];
-        if (index==2) display->sw2 = sw[2];
-        if (index==3) display->sw3 = sw[3];
+        display->sw = display->sw ^ (1 << index);
     }
     if (index==19) { printf("SW_VGA\n"); VGAsw = !VGAsw;}
   }
