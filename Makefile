@@ -3,7 +3,7 @@
 
 
 all:
-	 verilator -Wno-WIDTH -Wno-PINMISSING --trace --top-module display --cc --exe simulator.cpp *.v -CFLAGS -I/usr/include/freetype2 \
+	 verilator -Wno-WIDTH -Wno-PINMISSING --trace --top-module display --cc --exe simulator.cpp RGBpixmap.cpp *.v -CFLAGS -I/usr/include/freetype2 \
 	 -LDFLAGS -lglut -LDFLAGS -lGLU -LDFLAGS -lpthread -LDFLAGS -lGL -LDFLAGS -lfreetype -LDFLAGS -lftgl
 	 make -j -C obj_dir -f Vdisplay.mk Vdisplay
 run:

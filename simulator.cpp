@@ -2,6 +2,7 @@
 #include "verilated_vcd_c.h"
 #include <GL/glut.h>
 #include <FTGL/ftgl.h>
+#include "RGBpixmap.h"                   // pixel map definitions
 #include <thread>
 #include <iostream>
 
@@ -34,7 +35,7 @@ const int BOTTOM_PORCH		= 	10;
 const int VERTICAL_SYNC		=	2;
 const int TOTAL_HEIGHT		=	525;
 
-const int SEVEN_SEGMET_HEIGHT = 30;
+const int SEVEN_SEGMET_HEIGHT = 50;
 
 // pixels are buffered here
 float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
@@ -44,8 +45,13 @@ float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
 int mouse_x=-10, mouse_y=-10; 
 int sw0=0, sw1=0, sw2=0, sw3=0;
 
+//switch images
+RGBpixmap  swbmp_on;
+RGBpixmap  swbmp_off;
+
+
 // seven segment inputs
-char ss[5] = "0000";
+char ss[5] = "    ";
 int sub1,sub2;
 
 // calculating each pixel's size in accordance to OpenGL system
@@ -72,63 +78,57 @@ void render(void) {
 void render2(void) {
     int len, i;
     char *message="Seven Segment: ";
-    glClearColor(1.0f, 0.0f, 1.0f, 0.0f);
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    // Question: Why do we Push and Pop Matrix?
-    //glPushMatrix();
-    //int angle=0;
-    //glRotatef(angle, 0.0, 0.0, 1.0);
-    //glTranslatef(-750, 0, 0);
+    
     glColor3f(0.0f, 0.0f, 0.0f);
-    glRasterPos2f(800,-500);
-    //glScalef(2.0, 2.0, 2.0);
-
-    /*len = (int) strlen(message);
-    for (i = 0; i < len; i++) {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24 , message[i]);
-    }*/
+    glRasterPos2f(700,-500);
     
     /* Set the font size and render the SS display*/
-    glColor3f(0.0f, 1.0f, 0.0f);
     glPushAttrib(GL_ALL_ATTRIB_BITS);
 
+    //glPixelTransferf(GL_RED_BIAS, 0);
+    //glPixelTransferf(GL_GREEN_BIAS, 2);
+    //glPixelTransferf(GL_BLUE_BIAS, 0);
+    //FTGL::ftglRenderFont(font, ss, FTGL::RENDER_ALL);
+
+    FTGL::ftglSetFontFaceSize(font, 48, 48);
+    //seven segment print
+    for (i=0; i<4; i++) {
+        char str[2] = "\0"; /* 1 character + null terminator */
+        if (ss[i] ==0x20) {
+            glPixelTransferf(GL_GREEN_BIAS, 0); 
+            str[0] = '0';
+        }
+        else {
+            glPixelTransferf(GL_GREEN_BIAS, 2); 
+            str[0] = ss[i];
+        }
+        glRasterPos2f(700+64*i,-500);
+        FTGL::ftglRenderFont(font, str, FTGL::RENDER_ALL);
+    }
+    
+    //SWITCH buttons
+
     glPixelTransferf(GL_RED_BIAS, 0);
-    glPixelTransferf(GL_GREEN_BIAS, 2);
+    glPixelTransferf(GL_GREEN_BIAS, 0);
     glPixelTransferf(GL_BLUE_BIAS, 0);
 
-    FTGL::ftglSetFontFaceSize(font, 28, 28);
-    //seven segment print
-    FTGL::ftglRenderFont(font, ss, FTGL::RENDER_ALL);
-
-    glColor3f(1.0f, 1.0f, 1.0f);
-    glRectf(-995,-1000, -905, 1000);
-    glRectf(-895,-1000, -805, 1000);
-    glRectf(-795,-1000, -705, 1000);
-    glRectf(-695,-1000, -605, 1000);
-
-    if (sw0) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
+    /*
     glRasterPos2f(-995,-500);
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '0');
+    */
     
-    if (sw1) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
-    glRasterPos2f(-895,-500);
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '1');
-    
-    if (sw2) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
-    glRasterPos2f(-795,-500);
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '2');
-    
-    if (sw3) glColor3f(1.0f, 0.0f, 0.0f); else glColor3f(0.0f, 0.0f, 0.0f);
-    glRasterPos2f(-695,-500);
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'S');
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , 'W');
-    glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12 , '3');
+    glRasterPos2f(-995,-1000);
+    if (sw0) swbmp_on.draw(); else swbmp_off.draw();
+    glRasterPos2f(-895,-1000);
+    if (sw1) swbmp_on.draw(); else swbmp_off.draw();
+    glRasterPos2f(-795,-1000);
+    if (sw2) swbmp_on.draw(); else swbmp_off.draw();
+    glRasterPos2f(-695,-1000);
+    if (sw3) swbmp_on.draw(); else swbmp_off.draw();
 
     glutSwapBuffers();
     
@@ -328,10 +328,6 @@ void graphics_loop(int argc, char** argv) {
     glutInitWindowPosition(100, 100);
     int window=glutCreateWindow("Basys 3 Simulator");
     
-    //glutInitWindowSize(ACTIVE_WIDTH, 100);
-    //int window2=glutCreateWindow("Seven segment display");
-    //glutPositionWindow(100,580);
-    
     //seven segment subwindow
     sub2=glutCreateSubWindow(window, 0,ACTIVE_HEIGHT,ACTIVE_WIDTH, SEVEN_SEGMET_HEIGHT);
     glMatrixMode(GL_PROJECTION);
@@ -343,18 +339,20 @@ void graphics_loop(int argc, char** argv) {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glLineWidth(3.0);
     glTranslatef(1000, 1000, 0); 
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glColor3f(1.0, 1.0, 1.0);
+    glColor3f(0.0, 0.0, 0.0);
     glutMouseFunc(mousepress);
 
     /* Create a pixmap font from a TrueType file. */
     font = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
 
-    /* Destroy the font object. */
-    //ftglDestroyFont(font);
+    //init SW bitmap
+    //MakeImage("./sw.bmp", SWTextureName, false);
+    swbmp_on.readBMPFile("./SWon.bmp",false);
+    swbmp_off.readBMPFile("./SWoff.bmp",false);
 
     glutDisplayFunc(render2);
     
+    //VGA subwindow
     sub1=glutCreateSubWindow(window, 0,0,ACTIVE_WIDTH, ACTIVE_HEIGHT);
     glutDisplayFunc(render);
     
@@ -441,7 +439,7 @@ void sample_7s() {
     }
 
     for(int i=0; i<4; i++)
-        ss[i] = '0';
+        ss[i] = ' ';
               
     if(display->an==14) ss[0]=key;
     if(display->an==13) ss[1]=key;
