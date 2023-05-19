@@ -268,6 +268,21 @@ void Keyboard_input(unsigned char key, int x, int y) {
         case 'r':
             pressedkey=(0x2D <<1);
             break;
+        case '-':
+            pressedkey=(0x3F <<1);
+            break;
+        case 'U':
+            pressedkey=(0x09 <<1);
+            break;
+        case 'L':
+            pressedkey=(0x47 <<1);
+            break;
+        case 'o':
+            pressedkey=(0x2B <<1);
+            break;
+        case 'n':
+            pressedkey=(0x5C <<1);
+            break;
         case ' ':
             pressedkey=(0x29 <<1);
             break;
@@ -411,30 +426,30 @@ void sample_7s() {
             */
 
     switch (top->seg) {
-        case 0x3F: key='0'; break;
-        case 0x06: key='1'; break;
-        case 0x5B: key='2'; break;
-        case 0x4F: key='3'; break;
-        case 0x66: key='4'; break;
-        case 0x6D: key='5'; break;
-        case 0x7D: key='6'; break;
-        case 0x07: key='7'; break;
-        case 0x7F: key='8'; break;
-        case 0x6F: key='9'; break;
-        case 0x77: key='A'; break;
-        case 0x7C: key='b'; break;
-        case 0x39: key='C'; break;
-        case 0x5E: key='d'; break;
-        case 0x79: key='E'; break;
-        case 0x71: key='F'; break;
-        case 0x00: key=' '; break;
-        case 0x40: key='-'; break;
-        case 0x63: key='r'; break;
-        case 0x76: key='U'; break;
-        case 0x38: key='L'; break;
-        case 0x54: key='D'; break;
-        case 0x73: key='o'; break;
+        case 0x40: key='0'; break;
+        case 0x79: key='1'; break;
+        case 0x24: key='2'; break;
+        case 0x30: key='3'; break;
+        case 0x19: key='4'; break;
+        case 0x12: key='5'; break;
+        case 0x02: key='6'; break;
+        case 0x78: key='7'; break;
+        case 0x00: key='8'; break;
+        case 0x10: key='9'; break;
+        case 0x08: key='A'; break;
+        case 0x03: key='b'; break;
+        case 0x46: key='C'; break;
+        case 0x21: key='d'; break;
+        case 0x06: key='E'; break;
+        case 0x0E: key='F'; break;
+        case 0x7F: key=' '; break;
+        case 0x3F: key='-'; break;
+        case 0x09: key='U'; break;
+        case 0x47: key='L'; break;
+        case 0x7C: key='D'; break;
+        case 0x2B: key='o'; break;
         case 0x5C: key='n'; break;
+        case 0x0c: key='P'; break;
         default: key=' ';
     }
 

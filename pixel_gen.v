@@ -55,7 +55,7 @@ module pixel_gen(
     parameter BALL_VELOCITY_NEG = -2;
     // round ball from square image
     wire [2:0] rom_addr, rom_col;   // 3-bit rom address and rom column
-    reg [7:0] rom_data;             // data at current rom address
+    wire [7:0] rom_data;             // data at current rom address
     wire rom_bit;                   // signify when rom data is 1 or 0 for ball rgb control
     
     // Register Control
@@ -87,8 +87,8 @@ module pixel_gen(
     
     // assign object colors
     assign wall_rgb = 12'hAAA;      // gray wall
-    assign pad_rgb = 12'hAAA;       // gray paddle
-    assign ball_rgb = 12'hFFF;      // white ball
+    assign pad_rgb = 12'h0F0;       // gray paddle
+    assign ball_rgb = 12'hF00;      // white ball
     assign bg_rgb = 12'h111;       // close to black background
     
     // paddle 

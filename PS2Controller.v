@@ -40,7 +40,7 @@ module PS2Controller(
     input PS2_CLK;
     input PS2_DAT;
     output[7:0] dataOUT;
-    output[7:0] asciiOUT;
+    output reg [7:0] asciiOUT;
     output NEWDATA;
     output      KEYPRESS_ESC,
                 KEYPRESS_UP,
@@ -52,7 +52,6 @@ module PS2Controller(
                 KEYPRESS_R;
     
     
-    reg asciiOUT;
     reg NEW_DATA_FLAG = 1'b0;
     
     reg[7:0] DAT_INT_CURRENT  = 8'd0; // internal data register, current data
@@ -63,7 +62,7 @@ module PS2Controller(
     //reg STROBE_INT            = 1'd1;
     
     assign NEWDATA = NEW_DATA_FLAG;
-    
+    reg  release_key=1'b0;
     //always @ (negedge PS2_CLK)
     //    if (NEWDATA==1'b1)
     //        $display("pressed %d (%x) --> %d %x %c", dataOUT,dataOUT,asciiOUT,asciiOUT,asciiOUT);
@@ -123,9 +122,15 @@ module PS2Controller(
         end
         else
         begin
-            //STROBE = 1'b0;//(STROBE ^ (1'b1));
-            DAT_INT_PREVIOUS <= DAT_INT_CURRENT;
-            //dataOUT = 8'hFF;
+            if (DAT_INT_CURRENT == 8'hF0)
+            begin
+                release_key <= 1'b1;
+                DAT_INT_PREVIOUS <= 8'h00;
+            end
+            else
+            if (release_key==1'b0)
+                DAT_INT_PREVIOUS <= DAT_INT_CURRENT;
+            release_key <= 1'b0;
         end
     end
 
@@ -147,7 +152,16 @@ always @(*)
         8'h23: asciiOUT = "D";
         8'h24: asciiOUT = "E";
         8'h2B: asciiOUT = "F";
+        8'h1B: asciiOUT = "S";
+        8'h4D: asciiOUT = "P";
+        8'h31: asciiOUT = "n";
+        8'h4E: asciiOUT = "-";
+        8'h2D: asciiOUT = "r";
+        8'h3C: asciiOUT = "U";
+        8'h4B: asciiOUT = "L";
+        8'h44: asciiOUT = "o";
         default: asciiOUT = " ";
+        
     endcase
 endmodule
 

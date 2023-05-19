@@ -14,7 +14,7 @@ help:
 	@echo -e 'make help: display this message'
 	@echo -e 'make all: build the simulator with the specified verilog module'
 	@echo -e 'make run: simulate the verilog module on the BASYS3 simulator'
-	@echo -e 'make sim [LEVEL=n]: simulate the verilog module on the BASYS3 simulator dump the waveform down to ithe n-th level '
+	@echo -e 'make sim [LEVEL=n]: simulate the verilog module on the BASYS3 simulator dump the waveform down to the n-th level '
 
 all:
 	@verilator -Wno-WIDTH -Wno-PINMISSING --trace --top-module top --cc --exe simulator.cpp RGBpixmap.cpp *.v -CFLAGS -I/usr/include/freetype2 \
