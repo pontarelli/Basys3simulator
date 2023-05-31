@@ -59,7 +59,7 @@ module seven_segment(
                 "r": {cg,cf,ce,cd,cc,cb,ca} <= 7'h1C;
                 "U": {cg,cf,ce,cd,cc,cb,ca} <= 7'h09;
                 "L": {cg,cf,ce,cd,cc,cb,ca} <= 7'h47;
-                "o": {cg,cf,ce,cd,cc,cb,ca} <= 7'h7C;
+                "o": {cg,cf,ce,cd,cc,cb,ca} <= 7'h07;
                 "n": {cg,cf,ce,cd,cc,cb,ca} <= 7'h2B;
                 "S": {cg,cf,ce,cd,cc,cb,ca} <= 7'h12;
                 "P": {cg,cf,ce,cd,cc,cb,ca} <= 7'h0C;

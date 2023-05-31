@@ -128,9 +128,11 @@ module PS2Controller(
                 DAT_INT_PREVIOUS <= 8'h00;
             end
             else
-            if (release_key==1'b0)
-                DAT_INT_PREVIOUS <= DAT_INT_CURRENT;
-            release_key <= 1'b0;
+                begin 
+                if (release_key==1'b0)
+                    DAT_INT_PREVIOUS <= DAT_INT_CURRENT;
+                release_key <= 1'b0;
+                end
         end
     end
 
@@ -163,5 +165,6 @@ always @(*)
         default: asciiOUT = " ";
         
     endcase
+    
 endmodule
 

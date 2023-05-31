@@ -26,8 +26,8 @@ volatile bool gl_setup_complete = false;
 const int LEFT_PORCH		= 	48;
 const int ACTIVE_WIDTH		= 	640;
 const int RIGHT_PORCH		= 	16;
-const int HORIZONTAL_SYNC	=	96;
-const int TOTAL_WIDTH		=	800;
+const int HORIZONTAL_SYNC	=	64; //96;
+const int TOTAL_WIDTH		=	800; //768;
 
 const int TOP_PORCH			= 	33;
 const int ACTIVE_HEIGHT		= 	480;
