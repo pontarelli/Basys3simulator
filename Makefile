@@ -1,7 +1,7 @@
-NO_COLOR=\x1b[0m
-OK_COLOR=\x1b[32;01m
-ERROR_COLOR=\x1b[31;01m
-WARN_COLOR=\x1b[33;01m
+NO_COLOR=\e[0m
+OK_COLOR=\e[32;01m
+ERROR_COLOR=\e[31;01m
+WARN_COLOR=\e[33;01m
 OK_STRING=$(OK_COLOR)[OK]$(NO_COLOR)
 
 #define debug level for waveforms
@@ -37,7 +37,11 @@ sim: all
 project:
 	@echo -e '$(OK_COLOR)[*] Create vivado projet and open in gui mode $(NO_COLOR)'
 	@rm -rf basys3-1.* 
-	@vivado -source build.tcl  
+	@if vivado -source build.tcl ; then \
+		echo 'Done'; \
+	else \
+		printf "%b" "$(WARN_COLOR)source settings64.sh in Vivado directory \n$(NO_COLOR)" ; \
+	fi
 
 bitsteam:
 	@echo -e '$(OK_COLOR)[*] Run Vivado in batch mode to build the bitstream $(NO_COLOR)'
