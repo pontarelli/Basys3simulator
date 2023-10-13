@@ -24,7 +24,7 @@ module top(
     );
     
     
-    wire w_up, w_down, w_vid_on, w_p_tick;
+    wire w_vid_on, w_p_tick;
     wire [9:0] w_x, w_y;
     reg [11:0] rgb_reg;
     wire [11:0] rgb_next;
