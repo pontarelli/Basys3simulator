@@ -7,7 +7,13 @@ add_files vga_controller.v
 add_files pixel_gen.v
 add_files PS2Controller.v
 add_files seven_segment.v
+add_files seven_segment_sw.v
 add_files ball_rom.v
+set_property file_type SystemVerilog [get_files top.v]
+set_property file_type SystemVerilog [get_files seven_segment_sw.v]
+set_property top top [current_fileset]
+update_compile_order -fileset sources_1
+
 add_files -fileset constrs_1 -norecurse /home/sal/vpong/constraints.xdc
 launch_runs synth_1 -jobs 8
 launch_runs impl_1 -to_step write_bitstream -jobs 8
