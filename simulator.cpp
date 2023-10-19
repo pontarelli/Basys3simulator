@@ -8,6 +8,13 @@
 
 #include "Vtop.h"           // from Verilating "top.v"
 
+#if VGA == 1
+	#define VGAflag true
+#else
+	#define VGAflag false
+#endif
+
+
 using namespace std;
 
 FTGL::FTGLfont *font,*font7s;
@@ -68,7 +75,7 @@ void render(void) {
     glClear(GL_COLOR_BUFFER_BIT);
     
     // convert pixels into OpenGL rectangles
-    if (VGAsw)
+    if (VGAsw && VGAflag)
         for(int i = 0; i < ACTIVE_WIDTH; i++){
             for(int j = 0; j < ACTIVE_HEIGHT; j++){
                 glColor3f(graphics_buffer[i][j][0], graphics_buffer[i][j][1], graphics_buffer[i][j][2]);
@@ -137,9 +144,11 @@ void render2(void) {
     }
     
     glRasterPos2f(900,-750);
-    if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
-    glRasterPos2f(910,-920);
-    FTGL::ftglRenderFont(font, "VGA", FTGL::RENDER_ALL);
+    if (VGAflag){
+	    if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
+	    glRasterPos2f(910,-920);
+	    FTGL::ftglRenderFont(font, "VGA", FTGL::RENDER_ALL);
+    }
 
     //draw LEDs
     for (int i=0; i<16; i++) {
