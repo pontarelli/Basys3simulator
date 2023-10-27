@@ -63,6 +63,9 @@ RGBpixmap  img_board;
 
 // seven segment inputs
 char ss[5] = "    ";
+//seven segment delay
+#define SSDELAY 1000000
+int ssd[5] = {SSDELAY};
 int sub1,sub2;
 
 // calculating each pixel's size in accordance to OpenGL system
@@ -462,13 +465,14 @@ void sample_7s() {
         default: key=' ';
     }
 
-    for(int i=0; i<4; i++)
-        ss[i] = ' ';
-              
-    if(top->an==14) ss[0]=key;
-    if(top->an==13) ss[1]=key;
-    if(top->an==11) ss[2]=key;
-    if(top->an==7) ss[3]=key;
+    for(int i=0; i<4; i++) {
+        if (ssd[i]==0) ss[i] = ' ';
+    	if (ssd[i]>0) ssd[i]--;
+    }
+    if(top->an==14) { ss[0]=key;  ssd[0]=SSDELAY;}
+    if(top->an==13) { ss[1]=key;  ssd[1]=SSDELAY;} 
+    if(top->an==11) { ss[2]=key;  ssd[2]=SSDELAY;}
+    if(top->an==7)  { ss[3]=key;  ssd[3]=SSDELAY;}
 }
 // read VGA outputs and update graphics buffer
 void sample_pixel() {
