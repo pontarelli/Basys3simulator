@@ -44,11 +44,15 @@ project:
 		printf "%b" "$(WARN_COLOR)source settings64.sh in Vivado directory \n$(NO_COLOR)" ; \
 	fi
 
-bitsteam:
+bitstream:
 	@echo -e '$(OK_COLOR)[*] Run Vivado in batch mode to build the bitstream $(NO_COLOR)'
 	@rm -rf basys3-1.* 
-	@vivado -mode batch -source build.tcl  
-	@cp basys3-1.runs/impl_1/top.bit .
+	@if vivado -mode batch -source build.tcl ; then \
+		echo 'Done'; \
+	else \
+		printf "%b" "$(WARN_COLOR)source settings64.sh in Vivado directory \n$(NO_COLOR)" ; \
+	fi
+	#@cp basys3-1.runs/impl_1/top.bit .
 	@echo -e '$(OK_COLOR)[*] Created bitstream top.bit $(NO_COLOR)'
 
 program:
