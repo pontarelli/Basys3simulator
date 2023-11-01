@@ -56,6 +56,8 @@ int sw[16]={0};
 //images
 RGBpixmap  img_led_on;
 RGBpixmap  img_led_off;
+RGBpixmap  img_push_on;
+RGBpixmap  img_push_off;
 RGBpixmap  img_switch_on;
 RGBpixmap  img_switch_off;
 RGBpixmap  img_board;
@@ -146,6 +148,12 @@ void render2(void) {
         FTGL::ftglRenderFont(font, str, FTGL::RENDER_ALL);
     }
     
+    // draw push buttons
+    glRasterPos2f(620,330);
+    if (top->up) img_push_on.draw(); else img_push_off.draw();
+    glRasterPos2f(720,330);
+    if (top->down) img_push_on.draw(); else img_push_off.draw();
+    
     glRasterPos2f(900,-750);
     if (VGAflag){
 	    if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
@@ -188,19 +196,35 @@ void mousepress(int button, int state, int x, int y) {
     //left corner; our reference system has the origin in lower left
     //corner, this means we have to reflect y
     //mouse_y = WINDOWSIZE - mouse_y; 
-    //printf("mouse pressed at (%d,%d)\n", mouse_x, mouse_y); 
     int index= mouse_x/32;
+    //printf("mouse pressed at (%d,%d) idx=%d\n", mouse_x, mouse_y, index); 
     if (index<16) {
         //printf("SW%d\n", index);
         sw[index] = !sw[index];
         top->sw = top->sw ^ (1 << index);
+    }
+    if (index==16) { 
+	    //printf("PUSHUP\n"); 
+	    top->up =1;
+    }
+    if (index==17) { 
+	    //printf("PUSHDOWN\n"); 
+	    top->down =1;
     }
     if (index==19) { 
 	    //printf("SW_VGA\n"); 
 	    VGAsw = !VGAsw;
     }
   }
-  
+  if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
+    //mouse_x = x;
+    //mouse_y = y;
+    //int index= mouse_x/32;
+    //printf("mouse released at (%d,%d) idx=%d\n", mouse_x, mouse_y,index); 
+    top->down =0;
+    top->up   =0;
+  }
+
   glutPostRedisplay();
 }
 
@@ -369,6 +393,8 @@ void graphics_loop(int argc, char** argv) {
     font7s = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
 
     //load bitmaps
+    img_push_on.readBMPFile("./PUSHon.bmp",false);
+    img_push_off.readBMPFile("./PUSHoff.bmp",false);
     img_switch_on.readBMPFile("./SWon.bmp",false);
     img_switch_off.readBMPFile("./SWoff.bmp",false);
     img_led_on.readBMPFile("./LEDon.bmp",false);
