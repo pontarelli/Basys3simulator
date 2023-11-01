@@ -24,7 +24,7 @@ module top(
     );
 
     
-    logic [63:0] counter;
+    logic [63:0] counter,counter2;
     logic [3:0] cifra;
     logic [1:0] sel;
 
@@ -39,14 +39,14 @@ module top(
     assign LED[0] = sw[0] ^ sw[1];
 
     assign sel= counter[20:19];
-    assign {cifra,an}= (sel==2'b00) ? {counter[26:23], 4'b0111 }:
-                       (sel==2'b01) ? {counter[30:27], 4'b1011}:
-                       (sel==2'b10) ? {counter[34:31], 4'b1101}:
-                                      {counter[38:35], 4'b1110};
+    assign {cifra,an}= (sel==2'b00) ? {counter2[3:0], 4'b0111 }:
+                       (sel==2'b01) ? {counter2[7:4], 4'b1011}:
+                       (sel==2'b10) ? {4'b0, 4'b1101}:
+                                      {4'b0, 4'b1110};
 
+
+    fsm fsm_inst(clk,reset,up,down,counter2[7:0]);
     seven_segment_sw ss(.sw(cifra), .an(), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
-
-
 
 /*
 

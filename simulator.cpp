@@ -56,8 +56,10 @@ int sw[16]={0};
 //images
 RGBpixmap  img_led_on;
 RGBpixmap  img_led_off;
-RGBpixmap  img_push_on;
-RGBpixmap  img_push_off;
+RGBpixmap  img_up_on;
+RGBpixmap  img_up_off;
+RGBpixmap  img_down_on;
+RGBpixmap  img_down_off;
 RGBpixmap  img_switch_on;
 RGBpixmap  img_switch_off;
 RGBpixmap  img_board;
@@ -150,9 +152,9 @@ void render2(void) {
     
     // draw push buttons
     glRasterPos2f(620,330);
-    if (top->up) img_push_on.draw(); else img_push_off.draw();
+    if (top->up) img_up_on.draw(); else img_up_off.draw();
     glRasterPos2f(720,330);
-    if (top->down) img_push_on.draw(); else img_push_off.draw();
+    if (top->down) img_down_on.draw(); else img_down_off.draw();
     
     glRasterPos2f(900,-750);
     if (VGAflag){
@@ -393,8 +395,10 @@ void graphics_loop(int argc, char** argv) {
     font7s = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
 
     //load bitmaps
-    img_push_on.readBMPFile("./PUSHon.bmp",false);
-    img_push_off.readBMPFile("./PUSHoff.bmp",false);
+    img_up_on.readBMPFile("./UPon.bmp",false);
+    img_up_off.readBMPFile("./UPoff.bmp",false);
+    img_down_on.readBMPFile("./DOWNon.bmp",false);
+    img_down_off.readBMPFile("./DOWNoff.bmp",false);
     img_switch_on.readBMPFile("./SWon.bmp",false);
     img_switch_off.readBMPFile("./SWoff.bmp",false);
     img_led_on.readBMPFile("./LEDon.bmp",false);
