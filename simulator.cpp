@@ -307,19 +307,19 @@ void Keyboard_input(unsigned char key, int x, int y) {
             pressedkey=(0x2D <<1);
             break;
         case '-':
-            pressedkey=(0x3F <<1);
+            pressedkey=(0x4E <<1);
             break;
         case 'U':
-            pressedkey=(0x09 <<1);
+            pressedkey=(0x3C <<1);
             break;
         case 'L':
-            pressedkey=(0x47 <<1);
+            pressedkey=(0x4B <<1);
             break;
         case 'o':
-            pressedkey=(0x2B <<1);
+            pressedkey=(0x44 <<1);
             break;
         case 'n':
-            pressedkey=(0x5C <<1);
+            pressedkey=(0x31 <<1);
             break;
         case ' ':
             pressedkey=(0x29 <<1);
