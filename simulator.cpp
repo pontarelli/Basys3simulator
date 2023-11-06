@@ -236,110 +236,138 @@ void mousepress(int button, int state, int x, int y) {
 // handle up/down/left/right/space/enter arrow keys
 //int keys[6] = {};
 int pressedkey = 0;
-int bit=0;
-
+int millis=110000;
 void Keyboard_input(unsigned char key, int x, int y) {
     //cout << "key: " << key << endl;
-    bit=11;
     switch(key) {
         case 13: //ENTER
+            millis=0;
             pressedkey=(0x5A <<1);
             //keys[5] = 1;
             break;
         case 27: //ESC
+            millis=0;
             pressedkey=(0x76 <<1);
             break;
         case '0':
+            millis=0;
             pressedkey=(0x45 <<1);
             break;
         case '1':
+            millis=0;
             pressedkey=(0x16 <<1);
             break;
         case '2':
+            millis=0;
             pressedkey=(0x1E <<1);
             break;
         case '3':
+            millis=0;
             pressedkey=(0x26 <<1);
             break;
         case '4':
+            millis=0;
             pressedkey=(0x25 <<1);
             break;
         case '5':
+            millis=0;
             pressedkey=(0x2E <<1);
             break;
         case '6':
+            millis=0;
             pressedkey=(0x36 <<1);
             break;
         case '7':
+            millis=0;
             pressedkey=(0x3D <<1);
             break;
         case '8':
+            millis=0;
             pressedkey=(0x3E <<1);
             break;
         case '9':
+            millis=0;
             pressedkey=(0x46 <<1);
             break;
         case 'a': //'A'
+            millis=0;
             pressedkey=(0x1C <<1);
             break;
         case 'b': //'B'
+            millis=0;
             pressedkey=(0x32 <<1);
             break;
         case 'c': //'C'
+            millis=0;
             pressedkey=(0x21 <<1);
             break;
         case 'd': //'D'
+            millis=0;
             pressedkey=(0x23 <<1);
             break;
         case 'e': //'E'
+            millis=0;
             pressedkey=(0x24 <<1);
             break;
         case 'f': //'F' 
+            millis=0;
             pressedkey=(0x2B <<1);
             break;
         case 's': //'S'
+            millis=0;
             pressedkey=(0x1B <<1);
             break;
         case 'p':
+            millis=0;
             pressedkey=(0x4D <<1);
             break;
         case 'r':
+            millis=0;
             pressedkey=(0x2D <<1);
             break;
         case '-':
+            millis=0;
             pressedkey=(0x4E <<1);
             break;
         case 'U':
+            millis=0;
             pressedkey=(0x3C <<1);
             break;
         case 'L':
+            millis=0;
             pressedkey=(0x4B <<1);
             break;
         case 'o':
+            millis=0;
             pressedkey=(0x44 <<1);
             break;
         case 'n':
+            millis=0;
             pressedkey=(0x31 <<1);
             break;
         case ' ':
+            millis=0;
             pressedkey=(0x29 <<1);
             break;
     }
 }
 
 void Special_input(int key, int x, int y) {
-    bit=11;
     switch(key) {
         case GLUT_KEY_UP:
+            millis=0;
             pressedkey=(0x75 <<1);
             break;
         case GLUT_KEY_DOWN:
+            millis=0;
             pressedkey=(0x72 <<1);
             break;
         case GLUT_KEY_LEFT:
+            millis=0;
             pressedkey=(0x6B <<1);
             break;
         case GLUT_KEY_RIGHT:
+            millis=0;
             pressedkey=(0x74 <<1);
             break;
     }
@@ -347,22 +375,25 @@ void Special_input(int key, int x, int y) {
 
 //callback for key release
 void Special_input_release(int key, int x, int y) {
-    bit=11;
     switch(key) {
         case GLUT_KEY_UP:
             //keys[0] = 1;
+            millis=0;
             pressedkey=(0x29 <<1);
             break;
         case GLUT_KEY_DOWN:
             //keys[1] = 1;
+            millis=0;
             pressedkey=(0x29 <<1);
             break;
         case GLUT_KEY_LEFT:
             //keys[2] = 1;
+            millis=0;
             pressedkey=(0x29 <<1);
             break;
         case GLUT_KEY_RIGHT:
             //keys[3] = 1;
+            millis=0;
             pressedkey=(0x29 <<1);
             break;
     }
@@ -548,19 +579,20 @@ void tick() {
     top->clk = 0;
     
     //apply PS2 inputs
-    if ((main_time % 10000) == 0) { // every 10ms
+    if (millis==110000) {
         top->KEYSIG_CLK = 1;
+        top->KEYSIG_DATA = 1;
     }
-    if ((main_time % 10000) == 5000) {
-        if (bit==0) {
-            top->KEYSIG_DATA = 1;
-        }
-        else {
-            top->KEYSIG_CLK = 0; 
+    else {     
+        if ((millis % 10000) == 0) { // every 10ms
+            top->KEYSIG_CLK = 1;
             top->KEYSIG_DATA = pressedkey & 0x1;
             pressedkey = pressedkey >>1; 
-            bit--;
         }
+        if ((millis % 10000) == 5000) {
+                top->KEYSIG_CLK = 0; 
+        }
+        millis++;
     }
 
     //if ((main_time % 10000) == 0) { // every 10ms
