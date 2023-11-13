@@ -603,6 +603,9 @@ void tick() {
 
 // globally reset the model
 void reset() {
+    top->reset = 0;
+    top->eval();
+    tick();
     top->reset = 1;
     top->clk = 0;
     top->eval();
