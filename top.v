@@ -33,21 +33,43 @@ module top(
         else counter = counter +1;
     end
 
-    assign LED[15:3] = sw[15:3];
-    assign LED[2] = sw[0] & sw[1];
-    assign LED[1] = sw[0] | sw[1];
-    assign LED[0] = sw[0] ^ sw[1];
-
+    logic [3:0] tasto [3:0];
+    logic [10:0] temp ;
+    integer tick;
+    logic [1:0] tick2;
     assign sel= counter[20:19];
-    assign {cifra,an}= (sel==2'b00) ? {counter2[3:0], 4'b0111 }:
-                       (sel==2'b01) ? {counter2[7:4], 4'b1011}:
-                       (sel==2'b10) ? {4'b0, 4'b1101}:
-                                      {4'b0, 4'b1110};
-
-
-    fsm fsm_inst(clk,reset,up,down,counter2[7:0]);
+    assign {cifra,an}= (sel==2'b00) ? {tasto[3], 4'b0111 }:
+                       (sel==2'b01) ? {tasto[2], 4'b1011}:
+                       (sel==2'b10) ? {tasto[1], 4'b1101}:
+                                      {tasto[0], 4'b1110};
+    
     seven_segment_sw ss(.sw(cifra), .an(), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
 
+    
+    always_ff @(negedge KEYSIG_CLK or posedge reset) begin
+        if (reset==1) 
+        begin
+            temp=11'b0;
+            tick=0;
+            tasto={-1,-1,-1,-1};
+            tick2=0;
+        end    
+        else 
+            begin
+                temp[10:0]= {KEYSIG_DATA, temp[10:1] };
+                tick=tick+1;
+                if (tick==11)
+                    begin
+                        tick=0;
+                        $display("tasto: %h (%b)",temp[8:1],temp[8:1]);
+                        if (temp[8:1]=='h16) tasto[tick2]=1;
+                        if (temp[8:1]=='h1E) tasto[tick2]=2;
+                        if (temp[8:1]=='h26) tasto[tick2]=3;
+                        if (temp[8:1]=='h25) tasto[tick2]=4;
+                        tick2=tick2+1;
+                    end
+            end    
+    end     
 /*
 
     logic w_vid_on, w_p_tick;
