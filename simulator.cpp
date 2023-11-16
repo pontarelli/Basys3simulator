@@ -33,14 +33,14 @@ volatile bool gl_setup_complete = false;
 const int LEFT_PORCH		= 	48;
 const int ACTIVE_WIDTH		= 	640;
 const int RIGHT_PORCH		= 	16;
-const int HORIZONTAL_SYNC	=	64; //96;
+const int HORIZONTAL_SYNC	=	96;
 const int TOTAL_WIDTH		=	800; //768;
 
-const int TOP_PORCH			= 	33;
+const int TOP_PORCH			= 29;
 const int ACTIVE_HEIGHT		= 	480;
 const int BOTTOM_PORCH		= 	10;
 const int VERTICAL_SYNC		=	2;
-const int TOTAL_HEIGHT		=	525;
+const int TOTAL_HEIGHT		=	521;
 
 const int SEVEN_SEGMENT_HEIGHT = 90;
 
@@ -50,7 +50,7 @@ float graphics_buffer[ACTIVE_WIDTH][ACTIVE_HEIGHT][3] = {};
 
 //coordinates of last mouse click
 int mouse_x=-10, mouse_y=-10; 
-int VGAsw=0;
+int VGAsw=1;
 int sw[16]={0};
 
 //images
@@ -543,13 +543,15 @@ void sample_pixel() {
 
     if(!top->h_sync && pre_h_sync){ // on negative edge of h_sync
         // re-sync horizontal counter
-        coord_x = RIGHT_PORCH + ACTIVE_WIDTH + HORIZONTAL_SYNC;
+        //coord_x = RIGHT_PORCH + ACTIVE_WIDTH + HORIZONTAL_SYNC;
+        coord_x = TOTAL_WIDTH - (LEFT_PORCH+HORIZONTAL_SYNC);
         coord_y = (coord_y + 1) % TOTAL_HEIGHT;
     }
 
     if(!top->v_sync && pre_v_sync){ // on negative edge of v_sync
         // re-sync vertical counter
-        coord_y = TOP_PORCH + ACTIVE_HEIGHT + VERTICAL_SYNC;
+        //coord_y = TOP_PORCH + ACTIVE_HEIGHT + VERTICAL_SYNC;
+        coord_y = TOTAL_HEIGHT - (TOP_PORCH + VERTICAL_SYNC);
         //apply_input(); // inputs are pulsed once each new frame
     }
 
