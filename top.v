@@ -23,85 +23,76 @@ module top(
     output logic [3:0] B_VAL       // to DAC, to VGA port
     );
 
+    // Based on VGA standards found at vesa.org for 640x480 resolution
+    // Total horizontal width of screen = 800 pixels, partitioned  into sections
+    parameter HPW = 96;              // horizontal Pulse Width in pixels
+    parameter HB  = 48;              // horizontal back porch width in pixels
+    parameter HD  = 640;             // horizontal display area width in pixels
+    parameter HF  = 16;              // horizontal front porch width in pixels
+    parameter HMAX = HD+HF+HB+HPW-1; // max value of horizontal counter = 799
+    // Total vertical length of screen = 521 pixels, partitioned into sections
+    parameter VD = 480;             // vertical display area length in lines 
+    parameter VF = 10;              // vertical front porch length in lines  
+    parameter VB = 29;              // vertical back porch length in lines   
+    parameter VPW = 2;              // vertical Pulse width in lines  
+    parameter VMAX = VD+VF+VB+VPW-1; // max value of vertical counter = 521   
     
-    logic [63:0] counter,counter2;
-    logic [3:0] cifra;
-    logic [1:0] sel;
-
+    logic [31:0] counter; 
+    logic [8:0] tick; 
     always_ff @(posedge clk) begin
-        if (reset==1) counter=0;
-        else counter = counter +1;
+        if (reset==1) begin 
+		counter=0;
+		tick=0;
+	end
+	else if (counter=='d416800*4) begin
+		counter =0;
+		tick=tick+1;
+	     end
+	     else
+		counter = counter +1;	
     end
+    
+    // *** Generate 25MHz from 100MHz *********************************************************
+	logic  w_25MHz;
+	assign w_25MHz = (counter[1] == 0) ? 1 : 0; // assert tick 1/2 of the time
+    // ****************************************************************************************
 
-    logic [3:0] tasto [3:0];
-    logic [10:0] temp ;
-    integer tick;
-    logic [1:0] tick2;
-    assign sel= counter[20:19];
-    assign {cifra,an}= (sel==2'b00) ? {tasto[3], 4'b0111 }:
-                       (sel==2'b01) ? {tasto[2], 4'b1011}:
-                       (sel==2'b10) ? {tasto[1], 4'b1101}:
-                                      {tasto[0], 4'b1110};
+    logic [9:0] h_count, v_count;
+
+    //Logic for horizontal counter
+    always @(posedge w_25MHz or posedge reset)      // pixel tick
+        if(reset)
+            h_count = 0;
+        else
+            if(h_count == HMAX)                 // end of horizontal scan
+                h_count = 0;
+            else
+                h_count = h_count + 1;         
+  
+    // Logic for vertical counter
+    always @(posedge w_25MHz or posedge reset)
+        if(reset)
+            v_count = 0;
+        else
+            if(h_count == HMAX)                 // end of horizontal scan
+                if((v_count == VMAX))           // end of vertical scan
+                    v_count = 0;
+                else
+                    v_count = v_count + 1;
+        
+    // h_sync asserted within the horizontal retrace area
+    //assign h_sync = (h_count >= (HD+HB) && h_count <= (HD+HB+HPW-1));
+    assign h_sync = (h_count >= HPW); 
     
-    seven_segment_sw ss(.sw(cifra), .an(), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
+    // v_sync asserted within the vertical retrace area
+    assign v_sync = (v_count >= VPW);
+
+    logic [3:0] pixel;
+    assign pixel = (h_count==tick+HPW+HB+1)  ? 4'hf :
+                   (h_count>HPW+HB+638) ? 4'hf :
+                   (v_count==VPW+VB+1) || (v_count==VPW+VB+2) ? 4'hf :
+	           4'h0;
+    assign {R_VAL,G_VAL,B_VAL} = {pixel,4'b0,4'b0};
 
     
-    always_ff @(negedge KEYSIG_CLK or posedge reset) begin
-        if (reset==1) 
-        begin
-            temp=11'b0;
-            tick=0;
-            tasto={-1,-1,-1,-1};
-            tick2=0;
-        end    
-        else 
-            begin
-                temp[10:0]= {KEYSIG_DATA, temp[10:1] };
-                tick=tick+1;
-                if (tick==11)
-                    begin
-                        tick=0;
-                        $display("tasto: %h (%b)",temp[8:1],temp[8:1]);
-                        if (temp[8:1]=='h16) tasto[tick2]=1;
-                        if (temp[8:1]=='h1E) tasto[tick2]=2;
-                        if (temp[8:1]=='h26) tasto[tick2]=3;
-                        if (temp[8:1]=='h25) tasto[tick2]=4;
-                        tick2=tick2+1;
-                    end
-            end    
-    end     
-/*
-
-    logic w_vid_on, w_p_tick;
-    logic [9:0] w_x, w_y;
-    logic [11:0] rgb_reg;
-    logic [11:0] rgb_next;
-    logic [7:0] DATA,asciiOUT;
-    logic HZ5_CLK, NewData, KEYPRESS_S, KEYPRESS_P, KEYPRESS_R, KEYPRESS_ESC,KEYPRESS_UP, KEYPRESS_DOWN, KEYPRESS_LEFT, KEYPRESS_RIGHT;
-    
-    assign LED[15:3] = sw[15:3];
-    assign LED[2] = sw[0] & sw[1];
-    assign LED[1] = sw[0] | sw[1];
-    assign LED[0] = sw[0] ^ sw[1];
-    
-    seven_segment ss(.clk(clk), .reset(reset), .key(asciiOUT), .an(an), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
-    
-    /*vga_controller vga(.clk_100MHz(clk), .reset(reset), .video_on(w_vid_on),
-                       .hsync(h_sync), .vsync(v_sync), .p_tick(w_p_tick), .x(w_x), .y(w_y));
-    pixel_gen pg(.clk(clk), .reset(reset), .up(KEYPRESS_UP), .down(KEYPRESS_DOWN), 
-                 .video_on(w_vid_on), .x(w_x), .y(w_y), .rgb(rgb_next));
-    
-    
-    */
-/*    PS2Controller KeyboardDriver(KEYSIG_CLK, KEYSIG_DATA, DATA, asciiOUT, NewData, KEYPRESS_S,
-    KEYPRESS_P, KEYPRESS_R, KEYPRESS_ESC,KEYPRESS_UP, KEYPRESS_DOWN, KEYPRESS_LEFT, KEYPRESS_RIGHT);
-    
-    // rgb buffer
-    always @(posedge clk)
-        if(w_p_tick)
-            rgb_reg <= rgb_next;
-            
-    assign {R_VAL,G_VAL,B_VAL} = rgb_reg;
-    
-*/
 endmodule
