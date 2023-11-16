@@ -52,7 +52,7 @@ bitstream:
 	else \
 		printf "%b" "$(WARN_COLOR)source settings64.sh in Vivado directory \n$(NO_COLOR)" ; \
 	fi
-	#@cp basys3-1.runs/impl_1/top.bit .
+	@cp basys3-1.runs/impl_1/top.bit .
 	@echo -e '$(OK_COLOR)[*] Created bitstream top.bit $(NO_COLOR)'
 
 program:
