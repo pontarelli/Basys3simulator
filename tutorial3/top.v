@@ -66,6 +66,18 @@ module top(
                         if (temp[8:1]=='h1E) tasto[tick2]=2;
                         if (temp[8:1]=='h26) tasto[tick2]=3;
                         if (temp[8:1]=='h25) tasto[tick2]=4;
+                        if (temp[8:1]=='h2E) tasto[tick2]=5;
+                        if (temp[8:1]=='h36) tasto[tick2]=6;
+                        if (temp[8:1]=='h3D) tasto[tick2]=7;
+                        if (temp[8:1]=='h3E) tasto[tick2]=8;
+                        if (temp[8:1]=='h46) tasto[tick2]=9;
+                        if (temp[8:1]=='h45) tasto[tick2]=0;
+                        if (temp[8:1]=='h1C) tasto[tick2]='ha;
+                        if (temp[8:1]=='h32) tasto[tick2]='hb;
+                        if (temp[8:1]=='h21) tasto[tick2]='hc;
+                        if (temp[8:1]=='h23) tasto[tick2]='hd;
+                        if (temp[8:1]=='h24) tasto[tick2]='he;
+                        if (temp[8:1]=='h2B) tasto[tick2]='hf;
                         tick2=tick2+1;
                     end
             end    
