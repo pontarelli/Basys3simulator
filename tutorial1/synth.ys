@@ -1,0 +1,9 @@
+read -sv adder.sv
+hierarchy -top adder
+proc; opt; 
+#techmap; opt
+#aigmap; 
+#write_verilog synth.v
+#write_json carryadd_rtl.js
+techmap; opt
+write_json adder.js
