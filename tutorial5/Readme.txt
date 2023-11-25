@@ -5,5 +5,5 @@ il controller VGA che legge da una rome guida il display VGA della basys 3
 
 Puo' essere simualto direttamente con i comandi:
 
-cp top.v ../top.v ; make run
+cp top.v ../top.v ; cd .. ; make run VGA=1
 
