@@ -8,6 +8,11 @@ logic [7:0] count;
 		clk = 1; #5; clk = 0; #5;
 	end
 
+/* oppure
+logic clk=0;
+always #10 clk = ~clk;
+*/
+
 
 initial begin
 	$dumpfile("test.vcd");
