@@ -64,7 +64,7 @@ module mux2 #(parameter N = 8)
 	 output logic [N-1:0] y
         );
 
-	assign y = s ? a : b; 
+	assign y = s ? b : a; 
 
 endmodule
 
@@ -77,7 +77,7 @@ module mux4comp #(parameter N = 8)
 	logic[N-1:0] n1,n2;
 	mux2 #(N) m1 (a,b,s[0],n1);
 	mux2 #(N) m2 (c,d,s[0],n2);
-	mux2 #(N) m3 (n2,n1,s[1],y);
+	mux2 #(N) m3 (n1,n2,s[1],y);
 
 
 endmodule
@@ -85,16 +85,18 @@ endmodule
 module testbench ();
 
     logic [9:0] d3,d2,d1,d0;
-    tri [9:0] out;
+    tri [9:0] out4z;
+    logic [9:0] out4a,out4c,out4comp;
     logic [1:0] s;
 
-    //mux4z #(10) dut(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out));
-    //mux4a #(10) dut(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out));
-    //mux4c #(10) dut(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out));
-    mux4comp #(10) dut(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out));
+    //instanzio i quattro tipi di MUX da testare
+    mux4z #(10) dut1(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out4z));
+    mux4a #(10) dut2(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out4a));
+    mux4c #(10) dut3(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out4c));
+    mux4comp #(10) dut4(.a(d0),.b(d1),.c(d2),.d(d3),.s(s),.y(out4comp));
 
     initial begin
-        $monitor("d3=0x%h, d2=0x%h, d1=0x%h, d0=0x%h, y=0x%h, s=%d",d3,d2,d1,d0,out,s);
+        $monitor("d3=0x%h, d2=0x%h, d1=0x%h, d0=0x%h, s=%d  y4z=0x%h, y4a=0x%h, y4c=0x%h, y4comp=0x%h, ",d3,d2,d1,d0,s,out4z,out4a,out4c,out4comp);
         s =0;
         d1=10'd37;
         d0=10'h37;

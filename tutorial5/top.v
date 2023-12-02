@@ -37,6 +37,40 @@ module top(
     parameter VPW = 2;              // vertical Pulse width in lines  
     parameter VMAX = VD+VF+VB+VPW-1; // max value of vertical counter = 521   
     
+    logic [9:0] pos_x,pos_y;
+    logic [9:0] ray_x,ray_y;
+    assign pos_x=10'd100;
+    assign pos_y=10'd150;
+
+
+    assign R_VAL= ((ray_x >= pos_x) & (ray_x <= 16+pos_x))?4'b1111:4'b0000;
+    assign G_VAL=0;
+    assign B_VAL=0;
+    assign h_sync=(counter_x>=HPW);
+    assign v_sync=(counter_y>=VPW);
+    assign ray_x= counter_x-(HPW+HB);
+    assign ray_y= counter_y-(VPW+VB);
+
+    logic [9:0] counter_x,counter_y;
+    always @(posedge (clk)) begin
+        if (reset) begin
+            counter_x=0;
+            counter_y=0;
+        end
+        else begin
+            if (counter_x==HMAX) begin
+                counter_y=counter_y+1;
+                counter_x=0;
+            end
+            else counter_x=counter_x+1;
+            if (counter_y==VMAX+1) counter_y=0;
+        end
+    end        
+
+endmodule
+/*
+
+
     logic [31:0] counter; 
     logic [8:0] tick; 
     always_ff @(posedge clk) begin
@@ -96,3 +130,4 @@ module top(
 
     
 endmodule
+*/
