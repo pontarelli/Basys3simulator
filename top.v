@@ -23,76 +23,21 @@ module top(
     output logic [3:0] B_VAL       // to DAC, to VGA port
     );
 
-    // Based on VGA standards found at vesa.org for 640x480 resolution
-    // Total horizontal width of screen = 800 pixels, partitioned  into sections
-    parameter HPW = 96;              // horizontal Pulse Width in pixels
-    parameter HB  = 48;              // horizontal back porch width in pixels
-    parameter HD  = 640;             // horizontal display area width in pixels
-    parameter HF  = 16;              // horizontal front porch width in pixels
-    parameter HMAX = HD+HF+HB+HPW-1; // max value of horizontal counter = 799
-    // Total vertical length of screen = 521 pixels, partitioned into sections
-    parameter VD = 480;             // vertical display area length in lines 
-    parameter VF = 10;              // vertical front porch length in lines  
-    parameter VB = 29;              // vertical back porch length in lines   
-    parameter VPW = 2;              // vertical Pulse width in lines  
-    parameter VMAX = VD+VF+VB+VPW-1; // max value of vertical counter = 521   
+
+// example top level.
+// this top level just blink some leds depending on a counter or on user inputs
+
+    logic [31:0] counter;
     
-    logic [31:0] counter; 
-    logic [8:0] tick; 
     always_ff @(posedge clk) begin
-        if (reset==1) begin 
-		counter=0;
-		tick=0;
-	end
-	else if (counter=='d416800*4) begin
-		counter =0;
-		tick=tick+1;
-	     end
-	     else
-		counter = counter +1;	
+        if (reset==1) counter=0;
+        else counter = counter +1;
     end
-    
-    // *** Generate 25MHz from 100MHz *********************************************************
-	logic  w_25MHz;
-	assign w_25MHz = (counter[1] == 0) ? 1 : 0; // assert tick 1/2 of the time
-    // ****************************************************************************************
 
-    logic [9:0] h_count, v_count;
+    assign LED[15:8] = counter[27:20];
+    assign LED[7:3] = sw[7:3];
+    assign LED[2] = sw[0] & sw[1];
+    assign LED[1] = sw[0] | sw[1];
+    assign LED[0] = sw[0] ^ sw[1];
 
-    //Logic for horizontal counter
-    always @(posedge w_25MHz or posedge reset)      // pixel tick
-        if(reset)
-            h_count = 0;
-        else
-            if(h_count == HMAX)                 // end of horizontal scan
-                h_count = 0;
-            else
-                h_count = h_count + 1;         
-  
-    // Logic for vertical counter
-    always @(posedge w_25MHz or posedge reset)
-        if(reset)
-            v_count = 0;
-        else
-            if(h_count == HMAX)                 // end of horizontal scan
-                if((v_count == VMAX))           // end of vertical scan
-                    v_count = 0;
-                else
-                    v_count = v_count + 1;
-        
-    // h_sync asserted within the horizontal retrace area
-    //assign h_sync = (h_count >= (HD+HB) && h_count <= (HD+HB+HPW-1));
-    assign h_sync = (h_count >= HPW); 
-    
-    // v_sync asserted within the vertical retrace area
-    assign v_sync = (v_count >= VPW);
-
-    logic [3:0] pixel;
-    assign pixel = (h_count==tick+HPW+HB+1)  ? 4'hf :
-                   (h_count>HPW+HB+638) ? 4'hf :
-                   (v_count==VPW+VB+1) || (v_count==VPW+VB+2) ? 4'hf :
-	           4'h0;
-    assign {R_VAL,G_VAL,B_VAL} = {pixel,4'b0,4'b0};
-
-    
 endmodule

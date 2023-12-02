@@ -38,7 +38,7 @@ sim: all
 project:
 	@echo -e '$(OK_COLOR)[*] Create vivado projet and open in gui mode $(NO_COLOR)'
 	@rm -rf basys3-1.* 
-	@if vivado -source ./scripts/build.tcl ; then \
+	@if vivado -nojournal -nolog -source ./scripts/build.tcl ; then \
 		echo 'Done'; \
 	else \
 		printf "%b" "$(WARN_COLOR)source settings64.sh in Vivado directory \n$(NO_COLOR)" ; \
@@ -47,7 +47,7 @@ project:
 bitstream:
 	@echo -e '$(OK_COLOR)[*] Run Vivado in batch mode to build the bitstream $(NO_COLOR)'
 	@rm -rf basys3-1.* 
-	@if vivado -mode batch -source ./scripts/build.tcl ; then \
+	@if vivado -nojournal -nolog -mode batch -source ./scripts/build.tcl ; then \
 		echo 'Done'; \
 	else \
 		printf "%b" "$(WARN_COLOR)source settings64.sh in Vivado directory \n$(NO_COLOR)" ; \
@@ -58,7 +58,7 @@ bitstream:
 program:
 	@echo -e '$(OK_COLOR)[*] Program the basys 3 board $(NO_COLOR)'
 	@echo -e '$(WARN_COLOR)[-->] It must be tested! $(NO_COLOR)'
-	@vivado -mode tcl -source ./scripts/program_fpga.tcl 
+	@vivado -nojournal -nolog -mode tcl -source ./scripts/program_fpga.tcl 
 
 clean:
 	@rm -rf obj_dir/
