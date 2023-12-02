@@ -422,19 +422,19 @@ void graphics_loop(int argc, char** argv) {
     glutMouseFunc(mousepress);
 
     /* Create a pixmap font from a TrueType file. */
-    font = FTGL::ftglCreatePixmapFont("./CalibriRegular.ttf");
-    font7s = FTGL::ftglCreatePixmapFont("./SevenSegment.ttf");
+    font = FTGL::ftglCreatePixmapFont("./resources/CalibriRegular.ttf");
+    font7s = FTGL::ftglCreatePixmapFont("./resources/SevenSegment.ttf");
 
     //load bitmaps
-    img_up_on.readBMPFile("./UPon.bmp",false);
-    img_up_off.readBMPFile("./UPoff.bmp",false);
-    img_down_on.readBMPFile("./DOWNon.bmp",false);
-    img_down_off.readBMPFile("./DOWNoff.bmp",false);
-    img_switch_on.readBMPFile("./SWon.bmp",false);
-    img_switch_off.readBMPFile("./SWoff.bmp",false);
-    img_led_on.readBMPFile("./LEDon.bmp",false);
-    img_led_off.readBMPFile("./LEDoff.bmp",false);
-    img_board.readBMPFile("./board.bmp",false);
+    img_up_on.readBMPFile("./resources/UPon.bmp",false);
+    img_up_off.readBMPFile("./resources/UPoff.bmp",false);
+    img_down_on.readBMPFile("./resources/DOWNon.bmp",false);
+    img_down_off.readBMPFile("./resources/DOWNoff.bmp",false);
+    img_switch_on.readBMPFile("./resources/SWon.bmp",false);
+    img_switch_off.readBMPFile("./resources/SWoff.bmp",false);
+    img_led_on.readBMPFile("./resources/LEDon.bmp",false);
+    img_led_off.readBMPFile("./resources/LEDoff.bmp",false);
+    img_board.readBMPFile("./resources/board.bmp",false);
     
 
     glutDisplayFunc(render2);

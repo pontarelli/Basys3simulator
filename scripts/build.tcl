@@ -14,7 +14,7 @@ set_property file_type SystemVerilog [get_files seven_segment_sw.v]
 set_property top top [current_fileset]
 update_compile_order -fileset sources_1
 
-add_files -fileset constrs_1 -norecurse /home/sal/vpong/constraints.xdc
+add_files -fileset constrs_1 -norecurse[get_files constraints.xdc]
 launch_runs synth_1 -jobs 8
 wait_on_run synth_1
 if {[get_property PROGRESS [get_runs synth_1]] != "100%"} {
