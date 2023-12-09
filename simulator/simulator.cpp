@@ -231,6 +231,19 @@ void mousepress(int button, int state, int x, int y) {
 }
 
 
+int asciiToPs2[128]={
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0x5A,0,0, //0-15
+    0,0,0,0,0,0,0,0,0,0,0,0x76,0,0,0,0, //16-31
+    0x29,0,0,0,0,0,0,0,0,0,0,0x55,0x41,0x4E,0x49,0, //32-47
+    0x45,0x16,0x1E,0x26,0x25,0x2E,0x36,0x3D, //48-55
+    0x3E,0x46,0x00,0x00,0x00,0x00,0x00,0x00, //56-63
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, //64-79
+    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, //80-95
+    0x00,0x1C,0x32,0x21,0x23,0x24,0x2B,0x34, //96-103
+    0x33,0x43,0x3B,0x42,0x4B,0x3A,0x31,0x44, //104-111
+    0x4D,0x15,0x2D,0x1B,0x2C,0x3C,0x2A,0x1D, //112-119
+    0x22,0x35,0x1A,0x00,0x00,0x00,0x00,0x00  //120-127
+    }; // ASCII table size
 
 // PS2 keyboard input
 // handle up/down/left/right/space/enter arrow keys
@@ -238,118 +251,8 @@ void mousepress(int button, int state, int x, int y) {
 int pressedkey = 0;
 int millis=110000;
 void Keyboard_input(unsigned char key, int x, int y) {
-    //cout << "key: " << key << endl;
-    switch(key) {
-        case 13: //ENTER
-            millis=0;
-            pressedkey=(0x5A <<1);
-            //keys[5] = 1;
-            break;
-        case 27: //ESC
-            millis=0;
-            pressedkey=(0x76 <<1);
-            break;
-        case '0':
-            millis=0;
-            pressedkey=(0x45 <<1);
-            break;
-        case '1':
-            millis=0;
-            pressedkey=(0x16 <<1);
-            break;
-        case '2':
-            millis=0;
-            pressedkey=(0x1E <<1);
-            break;
-        case '3':
-            millis=0;
-            pressedkey=(0x26 <<1);
-            break;
-        case '4':
-            millis=0;
-            pressedkey=(0x25 <<1);
-            break;
-        case '5':
-            millis=0;
-            pressedkey=(0x2E <<1);
-            break;
-        case '6':
-            millis=0;
-            pressedkey=(0x36 <<1);
-            break;
-        case '7':
-            millis=0;
-            pressedkey=(0x3D <<1);
-            break;
-        case '8':
-            millis=0;
-            pressedkey=(0x3E <<1);
-            break;
-        case '9':
-            millis=0;
-            pressedkey=(0x46 <<1);
-            break;
-        case 'a': //'A'
-            millis=0;
-            pressedkey=(0x1C <<1);
-            break;
-        case 'b': //'B'
-            millis=0;
-            pressedkey=(0x32 <<1);
-            break;
-        case 'c': //'C'
-            millis=0;
-            pressedkey=(0x21 <<1);
-            break;
-        case 'd': //'D'
-            millis=0;
-            pressedkey=(0x23 <<1);
-            break;
-        case 'e': //'E'
-            millis=0;
-            pressedkey=(0x24 <<1);
-            break;
-        case 'f': //'F' 
-            millis=0;
-            pressedkey=(0x2B <<1);
-            break;
-        case 's': //'S'
-            millis=0;
-            pressedkey=(0x1B <<1);
-            break;
-        case 'p':
-            millis=0;
-            pressedkey=(0x4D <<1);
-            break;
-        case 'r':
-            millis=0;
-            pressedkey=(0x2D <<1);
-            break;
-        case '-':
-            millis=0;
-            pressedkey=(0x4E <<1);
-            break;
-        case 'U':
-            millis=0;
-            pressedkey=(0x3C <<1);
-            break;
-        case 'L':
-            millis=0;
-            pressedkey=(0x4B <<1);
-            break;
-        case 'o':
-            millis=0;
-            pressedkey=(0x44 <<1);
-            break;
-        case 'n':
-            millis=0;
-            pressedkey=(0x31 <<1);
-            break;
-        case ' ':
-            millis=0;
-            pressedkey=(0x29 <<1);
-            break;
-    }
+    millis=0;
+    pressedkey=(asciiToPs2[key] <<1);
 }
 
 void Special_input(int key, int x, int y) {
