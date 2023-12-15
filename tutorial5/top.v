@@ -37,38 +37,6 @@ module top(
     parameter VPW = 2;              // vertical Pulse width in lines  
     parameter VMAX = VD+VF+VB+VPW-1; // max value of vertical counter = 521   
     
-    logic [9:0] pos_x,pos_y;
-    logic [9:0] ray_x,ray_y;
-    assign pos_x=10'd100;
-    assign pos_y=10'd150;
-
-
-    assign R_VAL= ((ray_x >= pos_x) & (ray_x <= 16+pos_x))?4'b1111:4'b0000;
-    assign G_VAL=0;
-    assign B_VAL=0;
-    assign h_sync=(counter_x>=HPW);
-    assign v_sync=(counter_y>=VPW);
-    assign ray_x= counter_x-(HPW+HB);
-    assign ray_y= counter_y-(VPW+VB);
-
-    logic [9:0] counter_x,counter_y;
-    always @(posedge (clk)) begin
-        if (reset) begin
-            counter_x=0;
-            counter_y=0;
-        end
-        else begin
-            if (counter_x==HMAX) begin
-                counter_y=counter_y+1;
-                counter_x=0;
-            end
-            else counter_x=counter_x+1;
-            if (counter_y==VMAX+1) counter_y=0;
-        end
-    end        
-
-endmodule
-/*
 
 
     logic [31:0] counter; 
@@ -121,13 +89,50 @@ endmodule
     // v_sync deasserted during the pulse period
     assign v_sync = (v_count >= VPW);
 
+    //enable the pixel only in a window [tick:tick+4][tick:tick+4]
+    logic pixel_on;
+    assign pixel_on = (h_count>=tick+HPW+HB) && (h_count<=tick+HPW+HB+15) &&
+                   (v_count>=VPW+VB+tick) && (v_count<=VPW+VB+tick+15) ? 1'b1 :
+	           1'b0;
     logic [3:0] pixel;
-    assign pixel = (h_count==tick+HPW+HB+1)  || (h_count==tick+HPW+HB+2) ? 4'hf :
-                   (h_count>HPW+HB+638) ? 4'hf :
-                   (v_count==VPW+VB+1) || (v_count==VPW+VB+2) ? 4'hf :
-	           4'h0;
+    logic [3:0] x,y;
+    assign x=h_count-(tick+HPW+HB);
+    assign y=v_count-(tick+VPW+VB);
+    
+    logic [15:0] ball_row;
+    ball_rom rom_inst(y,ball_row);
+    assign pixel = (pixel_on & ball_row[x]) ? 4'b1111:4'b0;   
     assign {R_VAL,G_VAL,B_VAL} = {pixel,4'b0,4'b0};
 
     
 endmodule
-*/
+
+
+
+module ball_rom(
+    input [3:0] addr,   // 4-bit address
+    output reg [15:0] data   // 16-bit data
+    );
+    
+    always @*
+        case(addr)
+            4'b0000 :    data = 16'b00000011_11000000; //
+            4'b0001 :    data = 16'b00000111_11100000; //
+            4'b0010 :    data = 16'b00001111_11110000; //
+            4'b0011 :    data = 16'b00011111_11111000; //
+            4'b0100 :    data = 16'b00111111_11111100; //
+            4'b0101 :    data = 16'b01111111_11111110; //
+            4'b0110 :    data = 16'b11111111_11111111; //
+            4'b0111 :    data = 16'b11111111_11111111; //
+            4'b1000 :    data = 16'b11111111_11111111; //
+            4'b1001 :    data = 16'b11111111_11111111; //
+            4'b1010 :    data = 16'b11111111_11111111; //
+            4'b1011 :    data = 16'b01111111_11111110; //
+            4'b1100 :    data = 16'b00111111_11111100; // 
+            4'b1101 :    data = 16'b00011111_11111000; //
+            4'b1110 :    data = 16'b00001111_11110000; //
+            4'b1111 :    data = 16'b00000111_11100000; // 
+        endcase
+    
+endmodule
+
