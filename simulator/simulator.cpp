@@ -352,6 +352,7 @@ void graphics_loop(int argc, char** argv) {
     //glutIgnoreKeyRepeat(0); //report autorepeat keys    
     
     glutSetWindow(window);
+    glutDisplayFunc(render);
 
     gl_setup_complete = true;
     cout << "Graphics setup complete" << endl;
