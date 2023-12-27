@@ -493,10 +493,10 @@ void tick() {
         if ((millis % 10000) == 0) { // every 10ms
             top->KEYSIG_CLK = 1;
             top->KEYSIG_DATA = pressedkey & 0x1;
-            pressedkey = pressedkey >>1; 
         }
         if ((millis % 10000) == 5000) {
                 top->KEYSIG_CLK = 0; 
+                pressedkey = pressedkey >>1;
         }
         millis++;
     }
