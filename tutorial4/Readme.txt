@@ -21,6 +21,6 @@ cp top.v ../vpong/top.v ; cp fsm.sv ../vpong/fsm.sv ; make run
 
 5. il file top_bcd.v contiene il codice per il top level da usare per simulare/sintetizzare 
 la fsm BCD che guida il display a 7 segmenti della board di sviluppo basys 3
-Puo' essere simualto direttamente con i comandi:
+Puo' essere simulato direttamente con i comandi:
 
 cp top_bcd.v ../vpong/top.v ; cp fsm_bcd.sv ../vpong/fsm_bcd.sv ; make run
