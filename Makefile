@@ -8,6 +8,7 @@ OK_STRING=$(OK_COLOR)[OK]$(NO_COLOR)
 LEVEL=1
 VGA=0
 
+.PHONY: clean final_project
 
 help:
 	@echo -e '$(OK_COLOR)'
@@ -16,6 +17,7 @@ help:
 	@echo -e 'make all: build the simulator with the specified verilog module'
 	@echo -e 'make run [VGA=1]: simulate the verilog module on the BASYS3 simulator (VGA=1: enable VGA)'
 	@echo -e 'make sim [LEVEL=n]: simulate the verilog module on the BASYS3 simulator dump the waveform down to the n-th level '
+	@echo -e 'make final_project: run an example of the final project'
 	@echo -e 'make project: Create vivado projet and open in gui mode'
 	@echo -e 'make bitstream: Run Vivado in batch mode to build the bitstream'
 	@echo -e 'make program: program the Basys 3 board'
@@ -34,6 +36,14 @@ run: all
 sim: all
 	@echo -e '$(OK_COLOR)[*] Run Simulator with log level=${LEVEL} $(NO_COLOR)'
 	@./obj_dir/Vtop -vcd ${LEVEL}
+
+final_project: 
+	@echo -e '$(OK_COLOR)[*] Run an example of the final project $(NO_COLOR)'
+	@verilator -Wno-WIDTH -Wno-PINMISSING --trace --cc --exe -LDFLAGS '../final_project/libsecret_top.a' ./simulator/simulator.cpp ./simulator/RGBpixmap.cpp ./final_project//top.v ./final_project/secret_top.sv \
+	-CFLAGS -DVGA=1 -CFLAGS -I/usr/include/freetype2 -LDFLAGS -lglut -LDFLAGS -lGLU -LDFLAGS -lpthread -LDFLAGS -lGL -LDFLAGS -lfreetype -LDFLAGS -lftgl
+	@make --silent -j -C obj_dir -f Vtop.mk
+	@./obj_dir/Vtop 
+
 
 project:
 	@echo -e '$(OK_COLOR)[*] Create vivado projet and open in gui mode $(NO_COLOR)'
