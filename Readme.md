@@ -13,11 +13,16 @@ https://github.com/verilator/verilator.git
 
 # Tutorials
 5 tutorials are available. 
-The Readme file in the tutorial*/ directory provides a brief description of the tutorial
+The Readme file in the tutorial*/ directory provides a brief description of the tutorial.
+An example of the final project of the 2023 course can be simulated by running:
+
+```
+make final_project
+```
 
 # credits
 Original code of the VGA simulator taken from: 
 https://github.com/SamanMohseni/VGA-Simulation
 
-I also modified some examples fo the PS2 and VGA drivers from:  
+I also modified some examples of the PS2 and VGA drivers from:  
 https://github.com/FPGADude/Digital-Design
