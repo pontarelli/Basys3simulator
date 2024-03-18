@@ -60,6 +60,10 @@ RGBpixmap  img_up_on;
 RGBpixmap  img_up_off;
 RGBpixmap  img_down_on;
 RGBpixmap  img_down_off;
+RGBpixmap  img_left_on;
+RGBpixmap  img_left_off;
+RGBpixmap  img_right_on;
+RGBpixmap  img_right_off;
 RGBpixmap  img_switch_on;
 RGBpixmap  img_switch_off;
 RGBpixmap  img_board;
@@ -151,11 +155,17 @@ void render2(void) {
     }
     
     // draw push buttons
-    glRasterPos2f(620,330);
+    glRasterPos2f(620,400);
+    if (top->left) img_left_on.draw(); else img_left_off.draw();
+    glRasterPos2f(715,400);
     if (top->up) img_up_on.draw(); else img_up_off.draw();
-    glRasterPos2f(720,330);
+    glRasterPos2f(810,400);
     if (top->down) img_down_on.draw(); else img_down_off.draw();
+    glRasterPos2f(905,400);
+    if (top->right) img_right_on.draw(); else img_right_off.draw();
     
+
+
     glRasterPos2f(900,-750);
     if (VGAflag){
 	    if (VGAsw) img_switch_on.draw(); else img_switch_off.draw();
@@ -206,16 +216,19 @@ void mousepress(int button, int state, int x, int y) {
         top->sw = top->sw ^ (1 << index);
     }
     if (index==16) { 
-	    //printf("PUSHUP\n"); 
-	    top->up =1;
+	    top->left =1;
     }
     if (index==17) { 
-	    //printf("PUSHDOWN\n"); 
+	    top->up =1;
+    }
+    if (index==18) { 
 	    top->down =1;
     }
     if (index==19) { 
-	    //printf("SW_VGA\n"); 
-	    VGAsw = !VGAsw;
+        if (mouse_y<30) 
+            top->right =1;
+        else    
+            VGAsw = !VGAsw;
     }
   }
   if (button == GLUT_LEFT_BUTTON && state == GLUT_UP) {
@@ -225,6 +238,8 @@ void mousepress(int button, int state, int x, int y) {
     //printf("mouse released at (%d,%d) idx=%d\n", mouse_x, mouse_y,index); 
     top->down =0;
     top->up   =0;
+    top->left =0;
+    top->right =0;
   }
 
   glutPostRedisplay();
@@ -333,6 +348,10 @@ void graphics_loop(int argc, char** argv) {
     img_up_off.readBMPFile("./resources/UPoff.bmp",false);
     img_down_on.readBMPFile("./resources/DOWNon.bmp",false);
     img_down_off.readBMPFile("./resources/DOWNoff.bmp",false);
+    img_left_on.readBMPFile("./resources/Lon.bmp",false);
+    img_left_off.readBMPFile("./resources/Loff.bmp",false);
+    img_right_on.readBMPFile("./resources/Ron.bmp",false);
+    img_right_off.readBMPFile("./resources/Roff.bmp",false);
     img_switch_on.readBMPFile("./resources/SWon.bmp",false);
     img_switch_off.readBMPFile("./resources/SWoff.bmp",false);
     img_led_on.readBMPFile("./resources/LEDon.bmp",false);

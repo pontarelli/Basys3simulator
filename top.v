@@ -5,9 +5,9 @@ module top(
     input logic reset,            // btnR
     input logic KEYSIG_DATA,      // PS2
     input logic KEYSIG_CLK,       // PS2
-    input logic [15:0] sw,              // SWITCH
+    input logic [15:0] sw,        // SWITCH
     
-    input logic up,down,       // push buttons
+    input logic up,down,left,right,  // push buttons
     
     //LEDs
     output logic [15:0] LED, 
