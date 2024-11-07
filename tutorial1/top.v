@@ -23,21 +23,14 @@ module top(
     output logic [3:0] B_VAL       // to DAC, to VGA port
     );
 
-    
-    logic [31:0] counter;
-    
-    always_ff @(posedge clk) begin
-        if (reset==1) counter=0;
-        else counter = counter +1;
-    end
 
     assign LED[15:3] = sw[15:3];
     assign LED[2] = sw[0] & sw[1];
     assign LED[1] = sw[0] | sw[1];
     assign LED[0] = sw[0] ^ sw[1];
+    assign an=4'b1000;
 
-
-    seven_segment_sw ss(.sw(counter[28:25]), .an(an), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
+    seven_segment_sw ss(.sw(sw[3:0]), .an(an), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
 
 
 
