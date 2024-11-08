@@ -10,6 +10,8 @@ module secret_top (
         , input logic KEYSIG_CLK
         , input logic up
         , input logic down
+        , input logic left
+        , input logic right
         , output logic [3:0]  an
         , output logic [7:0]  seg
         , output logic h_sync

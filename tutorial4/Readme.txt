@@ -17,10 +17,10 @@ Per la simulazione con Icarus Verilog eseguire:
 la fsm che guida il display a 7 segmenti della board di sviluppo basys 3
 Puo' essere simulato direttamente con i comandi:
 
-cp top.v ../vpong/top.v ; cp fsm.sv ../vpong/fsm.sv ; make run
+cp top.v ../top.v ; cp fsm.sv ../fsm.sv ; cd ..; make run
 
 5. il file top_bcd.v contiene il codice per il top level da usare per simulare/sintetizzare 
 la fsm BCD che guida il display a 7 segmenti della board di sviluppo basys 3
 Puo' essere simulato direttamente con i comandi:
 
-cp top_bcd.v ../vpong/top.v ; cp fsm_bcd.sv ../vpong/fsm_bcd.sv ; make run
+cp top_bcd.v ../top.v ; cp fsm_bcd.sv ../fsm_bcd.sv ; cd .. ; make run

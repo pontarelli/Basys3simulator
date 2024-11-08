@@ -5,9 +5,9 @@ module top(
     input logic reset,            // btnR
     input logic KEYSIG_DATA,      // PS2
     input logic KEYSIG_CLK,       // PS2
-    input logic [15:0] sw,        // SWITCH
+    input logic [15:0] sw,              // SWITCH
     
-    input logic up,down,left,right,  // push buttons
+    input logic up,down,left,right,       // push buttons
     
     //LEDs
     output logic [15:0] LED, 
@@ -23,21 +23,25 @@ module top(
     output logic [3:0] B_VAL       // to DAC, to VGA port
     );
 
-
-// example top level.
-// this top level just blink some leds depending on a counter or on user inputs
-
-    logic [31:0] counter;
     
+    logic [63:0] counter,counter2;
+    logic [3:0] cifra;
+    logic [1:0] sel;
+
     always_ff @(posedge clk) begin
         if (reset==1) counter=0;
         else counter = counter +1;
     end
 
-    assign LED[15:8] = counter[27:20];
-    assign LED[7:3] = sw[7:3];
-    assign LED[2] = sw[0] & sw[1];
-    assign LED[1] = sw[0] | sw[1];
-    assign LED[0] = sw[0] ^ sw[1];
+    assign sel= counter[20:19];
+    assign {cifra,an}= (sel==2'b00) ? {counter2[3:0], 4'b0111 }:
+                       (sel==2'b01) ? {counter2[7:4], 4'b1011}:
+                       (sel==2'b10) ? {4'b0, 4'b1101}:
+                                      {4'b0, 4'b1110};
+
+
+    fsm fsm_inst(clk,reset,up,down,counter2[7:0]);
+    seven_segment_sw ss(.sw(cifra), .an(), .ca(seg[0]), .cb(seg[1]), .cc(seg[2]), .cd(seg[3]), .ce(seg[4]), .cf(seg[5]), .cg(seg[6]));
 
 endmodule
+

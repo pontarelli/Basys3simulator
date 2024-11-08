@@ -19,4 +19,4 @@ per la board di sviluppo basys 3 usando come input 4 switch
 un contatore che guida il display a 7 segmenti della board di sviluppo basys 3
 Puo' essere simulato direttamente con i comandi:
 
-cp top.v ../top.v ; cp seven_segment_sw.v ../seven_segment_sw.v ; make run
+cp top.v ../top.v ; cp seven_segment_sw.v ../seven_segment_sw.v ; cd .. ; make run
