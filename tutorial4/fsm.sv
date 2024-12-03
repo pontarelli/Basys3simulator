@@ -8,7 +8,7 @@ module fsm (
 );
 
 logic pressed;
-always_ff @( posedge clk ) begin : blockName
+always_ff @( posedge clk ) begin 
     if (reset == 1'b1) begin
         count <= 8'b0;
         pressed <= 1'b0;
